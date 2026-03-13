@@ -6,15 +6,8 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Table, THead, TBody, TR, TH, TD } from '@/components/ui/Table';
+import type { Status, LogItem } from '@/lib/interface';
 
-type Status = 'queued' | 'sending' | 'sent' | 'failed';
-
-interface LogItem {
-  _id: string; to: string | string[]; subject: string; status: Status;
-  queuedAt: string; sentAt?: string; errorMessage?: string; createdAt: string;
-  smtpConfigId?: { label: string; fromEmail: string };
-  apiKeyId?: { label: string; keyPrefix: string };
-}
 
 const getStatusVariant = (s: Status): 'success' | 'error' | 'warning' | 'info' => {
   const map: Record<Status, 'success' | 'error' | 'warning' | 'info'> = {

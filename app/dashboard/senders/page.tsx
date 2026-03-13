@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Table, THead, TBody, TR, TH, TD } from '@/components/ui/Table';
-
-interface SmtpConfig { _id: string; label: string; host: string; port: number; fromEmail: string; fromName: string; isDefault: boolean; user: string; secure: boolean; }
+import type { SmtpConfig } from '@/lib/interface';
 
 export default function SendersPage() {
   const [configs, setConfigs] = useState<SmtpConfig[]>([]);

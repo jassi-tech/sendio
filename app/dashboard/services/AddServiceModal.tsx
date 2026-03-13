@@ -4,12 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { X, HelpCircle, Loader2 } from 'lucide-react';
 import { ServiceDef, servicesApi } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
+import type { AddServiceModalProps } from '@/lib/interface';
 
-interface AddServiceModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (service: ServiceDef) => void;
-}
 
 export function AddServiceModal({ isOpen, onClose, onSelect }: AddServiceModalProps) {
   const [services, setServices] = useState<ServiceDef[]>([]);

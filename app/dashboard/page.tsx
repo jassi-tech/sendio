@@ -5,13 +5,7 @@ import { logsApi, smtpApi, keysApi } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-
-interface Stat {
-  label: string;
-  value: number;
-  icon: React.ElementType;
-  variant: 'success' | 'error' | 'warning' | 'accent' | 'info';
-}
+import type { Stat } from '@/lib/interface';
 
 export default function OverviewPage() {
   const [stats, setStats] = useState({ sent: 0, failed: 0, queued: 0, senders: 0, keys: 0 });

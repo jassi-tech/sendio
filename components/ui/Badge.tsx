@@ -1,11 +1,6 @@
 import React from 'react';
+import type { BadgeProps } from '@/lib/interface';
 
-interface BadgeProps {
-  children: React.ReactNode;
-  variant?: 'success' | 'warning' | 'error' | 'info' | 'accent' | 'neutral';
-  icon?: React.ReactNode;
-  className?: string;
-}
 
 export const Badge = ({
   children,

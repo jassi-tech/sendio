@@ -5,20 +5,8 @@ import { X, HelpCircle, Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { servicesApi, ServiceDef, smtpApi } from '@/lib/api';
+import type { SmtpService, EditServiceModalProps } from '@/lib/interface';
 
-interface SmtpService {
-  id: string;
-  provider: string; // e.g. 'gmail'
-  name?: string;
-  isDefault?: boolean;
-}
-
-interface EditServiceModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  service: SmtpService | null;
-  onUpdate?: () => void;
-}
 
 export function EditServiceModal({ isOpen, onClose, service, onUpdate }: EditServiceModalProps) {
   const [providerDef, setProviderDef] = useState<ServiceDef | null>(null);

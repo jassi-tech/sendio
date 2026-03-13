@@ -1,9 +1,6 @@
 import React from 'react';
+import type { TableProps } from '@/lib/interface';
 
-interface TableProps {
-  children: React.ReactNode;
-  className?: string;
-}
 
 export const Table = ({ children, className = '' }: TableProps) => (
   <div className={`w-full overflow-x-auto rounded-s-12 border border-border ${className}`}>

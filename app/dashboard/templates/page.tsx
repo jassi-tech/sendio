@@ -6,9 +6,8 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
+import type { Template, FullTemplate } from '@/lib/interface';
 
-interface Template { _id: string; templateId: string; name: string; subject: string; variables: string[]; updatedAt: string; isDefault?: boolean; }
-interface FullTemplate extends Template { html: string; }
 
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([]);

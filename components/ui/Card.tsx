@@ -1,12 +1,6 @@
 import React from 'react';
+import type { CardProps } from '@/lib/interface';
 
-interface CardProps {
-  children: React.ReactNode;
-  variant?: 'solid' | 'glass' | 'elevated';
-  className?: string;
-  padded?: boolean;
-  hoverable?: boolean;
-}
 
 export const Card = ({
   children,

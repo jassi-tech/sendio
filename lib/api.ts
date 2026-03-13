@@ -1,3 +1,6 @@
+import type { ServiceDef } from './interface';
+export type { ServiceDef } from './interface';
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 function getToken(): string | null {
@@ -113,16 +116,6 @@ export const templatesApi = {
 };
 
 // Services catalogue (public – no auth)
-export interface ServiceDef {
-  id: string;
-  name: string;
-  category: 'personal' | 'transactional';
-  smtpHost?: string;
-  smtpPort?: number;
-  smtpSecure?: boolean;
-  isSelectable: boolean;
-  logoUrl?: string;
-}
 
 export const servicesApi = {
   list: (): Promise<ServiceDef[]> =>

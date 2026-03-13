@@ -1,10 +1,6 @@
 import React from 'react';
+import type { InputProps } from '@/lib/interface';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
-  label?: string;
-  error?: string;
-  multiline?: boolean;
-}
 
 export const Input = React.forwardRef<HTMLInputElement & HTMLTextAreaElement, InputProps>(
   ({ label, error, multiline, className = '', ...props }, ref) => {

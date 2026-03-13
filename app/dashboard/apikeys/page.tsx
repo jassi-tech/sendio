@@ -7,13 +7,12 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Table, THead, TBody, TR, TH, TD } from '@/components/ui/Table';
+import type { ApiKeyItem, ApiKeySmtpConfig } from '@/lib/interface';
 
-interface ApiKeyItem { _id: string; label: string; keyPrefix: string; isActive: boolean; lastUsedAt?: string; createdAt: string; smtpConfigId: { label: string; fromEmail: string } | null; }
-interface SmtpConfig { _id: string; label: string; fromEmail: string; }
 
 export default function ApiKeysPage() {
   const [keys, setKeys] = useState<ApiKeyItem[]>([]);
-  const [senders, setSenders] = useState<SmtpConfig[]>([]);
+  const [senders, setSenders] = useState<ApiKeySmtpConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -24,7 +23,7 @@ export default function ApiKeysPage() {
   useEffect(() => {
     Promise.all([keysApi.list(), smtpApi.list()]).then(([k, s]) => {
       setKeys(k as ApiKeyItem[]);
-      setSenders(s as SmtpConfig[]);
+      setSenders(s as ApiKeySmtpConfig[]);
     }).finally(() => setLoading(false));
   }, []);
 

@@ -9,13 +9,8 @@ import { AddServiceModal } from './AddServiceModal';
 import { EditServiceModal } from './EditServiceModal';
 import { ConfigServiceModal } from './ConfigServiceModal';
 import { smtpApi, ServiceDef } from '@/lib/api';
+import type { SmtpService } from '@/lib/interface';
 
-interface SmtpService {
-  id: string;
-  provider: string; // e.g. 'gmail'
-  name?: string;
-  isDefault?: boolean;
-}
 
 export default function ServicesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);

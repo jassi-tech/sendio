@@ -2,9 +2,7 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { authApi, setToken as persistToken, clearToken } from './api';
-
-interface User { id: string; email: string; name?: string; publicKey?: string; privateKey?: string; }
-interface AuthCtx { user: User | null; loading: boolean; login: (token: string) => Promise<void>; logout: () => void; fetchUser: () => Promise<void>; }
+import type { User, AuthCtx } from './interface';
 
 const Ctx = createContext<AuthCtx>({ user: null, loading: true, login: async () => {}, logout: () => {}, fetchUser: async () => {} });
 

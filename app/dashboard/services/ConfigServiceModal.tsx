@@ -5,13 +5,8 @@ import { X, HelpCircle, Check, Search } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { servicesApi, ServiceDef, smtpApi } from '@/lib/api';
+import type { ConfigServiceModalProps } from '@/lib/interface';
 
-interface ConfigServiceModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  serviceDef: ServiceDef | null;
-  onCreated?: () => void;
-}
 
 export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: ConfigServiceModalProps) {
   const [name, setName] = useState('');
