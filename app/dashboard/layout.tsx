@@ -1,0 +1,172 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
+import {
+  LayoutDashboard, Server, FileCode2, Key, ScrollText, LogOut, Mail, Menu, X
+} from 'lucide-react';
+import { useAuth } from '@/lib/auth';
+import { Button } from '@/components/ui/Button';
+
+const navItems = [
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
+  { href: '/dashboard/services', icon: Server, label: 'Services' },
+  { href: '/dashboard/senders', icon: Server, label: 'Senders' },
+  { href: '/dashboard/templates', icon: FileCode2, label: 'Templates' },
+  { href: '/dashboard/apikeys', icon: Key, label: 'API Keys' },
+  { href: '/dashboard/logs', icon: ScrollText, label: 'Logs' },
+  { href: '/dashboard/account', icon: Key, label: 'Account' }, // Reusing Key icon for now as in reference image or User icon if available
+];
+
+function SidebarContent({ onClose }: { onClose?: () => void }) {
+  const { user, logout } = useAuth();
+  const pathname = usePathname();
+
+  return (
+    <>
+      {/* Sidebar Top / Logo */}
+      <div className="p-s-24 border-b border-border flex items-center gap-s-12">
+        <div className="w-s-40 h-s-40 bg-gradient-to-br from-accent to-accent-dim rounded-s-10 flex items-center justify-center shadow-accent-glow">
+          <Mail className="w-s-20 h-s-20 text-white" />
+        </div>
+        <span className="text-s-20 font-extrabold text-text-primary tracking-tight">MailFlow</span>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-s-16 space-y-s-4">
+        {navItems.map(({ href, icon: Icon, label }) => {
+          const isActive = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => onClose?.()}
+              className={`flex items-center gap-s-12 p-s-12 rounded-s-10 text-s-14 transition-all no-underline font-medium ${
+                isActive
+                  ? 'text-accent bg-accent/10 shadow-[inset_s-2_0_0_0_currentColor]'
+                  : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
+              }`}
+            >
+              <Icon className="w-s-18 h-s-18" />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Sidebar Footer / User Profile */}
+      <div className="p-s-20 border-t border-border bg-bg-card/50">
+        <div className="flex items-center gap-s-12 mb-s-20">
+          <div className="w-s-36 h-s-36 bg-bg-elevated rounded-full flex items-center justify-center border border-border">
+            <span className="text-s-12 font-bold text-accent">
+              {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div className="min-w-0">
+            <div className="text-s-14 font-bold text-text-primary truncate">
+              {user?.name || 'User'}
+            </div>
+            <div className="text-s-12 text-text-muted truncate">
+              {user?.email}
+            </div>
+          </div>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full hover:border-error hover:text-error hover:bg-error/5"
+          onClick={logout}
+          icon={<LogOut className="w-s-14 h-s-14" />}
+        >
+          Sign out
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function DashboardShell({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!loading && !user) router.replace('/auth');
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-bg-base flex items-center justify-center">
+        <div className="animate-spin w-s-40 h-s-40 border-s-3 border-border border-t-accent rounded-full" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen bg-bg-base text-text-primary">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex w-s-280 bg-bg-card border-r border-border flex-col z-20">
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar Drawer */}
+      <aside className={`
+        fixed top-0 left-0 bottom-0 h-full w-s-280 bg-bg-card z-50 lg:hidden transform transition-transform duration-300 ease-out flex flex-col
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="absolute top-s-16 right-s-16">
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="p-s-8 text-text-secondary hover:text-text-primary"
+          >
+            <X className="w-s-24 h-s-24" />
+          </button>
+        </div>
+        <SidebarContent onClose={() => setIsMobileMenuOpen(false)} />
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col lg:pl-s-10 min-w-0">
+        {/* Top bar (for breadcrumbs or mobile toggle) */}
+        <header className="h-s-72 border-b border-border bg-bg-base/80 backdrop-blur-md sticky top-0 z-10 px-s-20 flex items-center lg:px-s-40">
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="lg:hidden p-s-10 -ml-s-10 text-text-secondary hover:text-text-primary transition-colors"
+          >
+            <Menu className="w-s-24 h-s-24" />
+          </button>
+          
+          <div className="ml-s-16 lg:ml-0 font-semibold text-text-secondary flex items-center gap-s-8">
+             <span className="hidden sm:inline">Dashboard</span>
+             <span className="text-text-muted hidden sm:inline">/</span>
+             <span className="text-text-primary capitalize">{pathname.split('/').pop() || 'Overview'}</span>
+          </div>
+        </header>
+
+        <main className="p-s-20 md:p-s-32 lg:p-s-40">
+          <div className="max-w-s-1200 mx-auto">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <DashboardShell>{children}</DashboardShell>
+  );
+}
+
+

@@ -1,26 +1,176 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+/* ============================================================
+   FMDS – Fluid Multiplier Design System
+   Base unit --1 scales with viewport across breakpoints.
+   All dimensions: calc(var(--1) * N)
+   Tailwind classes generated dynamically in tailwind.config.ts
+   ============================================================ */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Desktop reference: 1920px → 1px = 0.052083vw */
+    --1: min(1px, 0.052083vw);
+  }
+
+  @media (min-width: 768px) and (max-width: 1199.98px) {
+    :root {
+      --1: min(1px, 0.059435vw);
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    :root {
+      --1: min(1px, 0.2vw);
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: 'Inter', sans-serif;
+    background: #0f0f13;
+    color: #e0e0e8;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1a1a24;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #3a3a50;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6c63ff;
+  }
+
+  /* Design colors mapped to CSS variables */
+  :root {
+    --color-bg-base: #0f0f13;
+    --color-bg-card: #1a1a24;
+    --color-bg-elevated: #22222f;
+    --color-bg-hover: #2a2a3a;
+    --color-border: #2e2e40;
+    --color-border-dim: #232333;
+
+    --color-accent: #6c63ff;
+    --color-accent-dim: #5a52e0;
+    --color-accent-glow: rgba(108, 99, 255, 0.25);
+
+    --color-text-primary: #f0f0f8;
+    --color-text-secondary: #9090a8;
+    --color-text-muted: #5c5c78;
+
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #38bdf8;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   Utility classes
+   ============================================================ */
+@layer utilities {
+  .glass {
+    background: rgba(26, 26, 36, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border);
+  }
+
+  .card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: calc(var(--1) * 12);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #6c63ff 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .accent-glow {
+    box-shadow: 0 0 calc(var(--1) * 24) var(--color-accent-glow);
+  }
+
+  /* Sidebar active nav item */
+  .nav-active {
+    background: rgba(108, 99, 255, 0.15);
+    border-left: calc(var(--1) * 2) solid var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  /* Transitions */
+  .transition-all {
+    transition: all 0.2s ease;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(calc(var(--1) * 8));
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      box-shadow: 0 0 calc(var(--1)*8) var(--color-accent-glow);
+    }
+
+    50% {
+      box-shadow: 0 0 calc(var(--1)*24) rgba(108, 99, 255, 0.4);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-spin {
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* Custom pattern for preview pane background */
+  .preview-bg-pattern {
+    background-image:
+      linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+      linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+      linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  }
 }
