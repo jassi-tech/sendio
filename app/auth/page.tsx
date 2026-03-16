@@ -25,7 +25,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-base flex items-center justify-center p-s-24 relative overflow-hidden">
+    <div className="min-h-screen max-w-7xl mx-auto bg-bg-base flex items-center justify-center p-s-24 relative overflow-hidden">
       {/* Back to Home Link */}
       <Link 
         href="/" 

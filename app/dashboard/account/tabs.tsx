@@ -5,7 +5,7 @@ import { authApi } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { RefreshCw, Trash2, CheckCircle, EyeOff, Eye } from 'lucide-react';
+import { RefreshCw, Trash2, CheckCircle, EyeOff, Eye, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export function GeneralTab() {
@@ -136,6 +136,8 @@ export function GeneralTab() {
 }
 
 export function SubscriptionTab() {
+  const router = useRouter();
+
   return (
     <Card variant="solid">
       <h3 className="text-s-16 font-bold mb-s-24 tracking-tight">Subscription Details</h3>
@@ -160,7 +162,12 @@ export function SubscriptionTab() {
       </div>
 
       <div className="flex gap-s-12">
-        <Button variant="primary" size="sm" icon={<CheckCircle className="w-s-14 h-s-14" />}>
+        <Button 
+          variant="primary" 
+          size="sm" 
+          icon={<CheckCircle className="w-s-14 h-s-14" />}
+          onClick={() => router.push('/dashboard/upgrade')}
+        >
           Upgrade
         </Button>
         <Button variant="ghost" size="sm" className="opacity-50 cursor-not-allowed">
