@@ -9,7 +9,7 @@ export default function Home() {
   const { user, loading } = useAuth();
 
   return (
-    <div className="min-h-screen bg-bg-base relative overflow-hidden">
+    <div className="min-h-screen max-w-7xl mx-auto bg-bg-base relative overflow-hidden">
       {/* Background glow orbs */}
       <div className="absolute top-[-10%] left-[-10%] w-s-600 h-s-600 bg-[radial-gradient(circle,_rgba(108,99,255,0.08)_0%,_transparent_70%)] blur-s-60 pointer-events-none" />
       <div className="absolute bottom-[5%] right-[-5%] w-s-500 h-s-500 bg-[radial-gradient(circle,_rgba(167,139,250,0.06)_0%,_transparent_70%)] blur-s-60 pointer-events-none" />

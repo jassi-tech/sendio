@@ -54,7 +54,7 @@ const RESOURCES = [
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-bg-base text-text-primary">
+    <div className="min-h-screen max-w-7xl mx-auto bg-bg-base text-text-primary">
       <Navbar />
 
       {/* Hero Section */}

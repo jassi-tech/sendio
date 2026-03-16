@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { BookOpen, Code2, Play, Zap, Shield, Settings, AlertCircle, ChevronRight } from 'lucide-react';
+import { BookOpen, Code2, Play, Zap, Shield, Settings, AlertCircle, ChevronRight, Copy, Check } from 'lucide-react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 
@@ -233,82 +233,128 @@ curl -X POST https://api.mailflow.com/v1/emails/send \\
 export default function DocsPage() {
   const [selectedSection, setSelectedSection] = useState('getting-started');
   const selectedContent = DOCS_SECTIONS.find(s => s.id === selectedSection);
+  const currentIndex = DOCS_SECTIONS.findIndex(s => s.id === selectedSection);
 
   return (
-    <div className="min-h-screen bg-bg-base text-text-primary">
+    <div className="min-h-screen max-w-7xl mx-auto bg-bg-base text-text-primary flex flex-col">
       <Navbar />
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="hidden lg:block w-s-280 bg-bg-card/50 border-r border-border py-s-80 px-s-32 sticky top-0 h-screen overflow-y-auto">
-          <div className="mb-s-48">
-            <div className="flex items-center gap-s-12 mb-s-24">
-              <BookOpen className="w-s-20 h-s-20 text-accent" />
-              <h2 className="text-s-18 font-bold">Documentation</h2>
+      {/* Simple Header */}
+      <section className="border-b border-border/40 px-s-40 py-s-60">
+        <div className="max-w-s-1400 mx-auto">
+          <div className="flex items-start gap-s-20">
+            <div className="text-accent mt-s-4">
+              <BookOpen className="w-s-32 h-s-32" />
+            </div>
+            <div>
+              <h1 className="text-s-56 font-black text-text-primary mb-s-12">Documentation</h1>
+              <p className="text-s-18 text-text-secondary max-w-s-600">Complete guides and API reference for MailFlow integration</p>
             </div>
           </div>
+        </div>
+      </section>
 
-          <nav className="space-y-s-8">
-            {DOCS_SECTIONS.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => setSelectedSection(section.id)}
-                className={`w-full text-left px-s-16 py-s-12 rounded-s-8 transition-all flex items-center justify-between ${
-                  selectedSection === section.id
-                    ? 'bg-accent/15 text-accent font-bold'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-elevated'
-                }`}
-              >
-                <span className="text-s-14">{section.title}</span>
-                {selectedSection === section.id && <ChevronRight className="w-s-16 h-s-16" />}
-              </button>
-            ))}
+      <div className="flex flex-1 relative">
+        {/* Clean Sidebar */}
+        <aside className="hidden lg:flex lg:w-s-280 bg-bg-card/30 border-r border-border/40 flex-col sticky top-s-0">
+          <div className="p-s-40 border-b border-border/40">
+            <h2 className="text-s-13 font-bold text-text-muted uppercase tracking-widest">Sections</h2>
+          </div>
+          
+          <nav className="flex-1 overflow-y-auto p-s-24">
+            <div className="space-y-s-8">
+              {DOCS_SECTIONS.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() => setSelectedSection(section.id)}
+                  className={`w-full text-left px-s-16 py-s-14 rounded-s-10 transition-all duration-200 flex items-center gap-s-14 text-s-14 ${
+                    selectedSection === section.id
+                      ? 'bg-accent/20 text-accent font-semibold border border-accent/40'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-elevated/60'
+                  }`}
+                >
+                  <div className="flex-shrink-0 text-s-18">
+                    {section.icon}
+                  </div>
+                  <span className="flex-1">{section.title}</span>
+                </button>
+              ))}
+            </div>
           </nav>
+
+          {/* Sidebar Footer Links */}
+          <div className="p-s-24 border-t border-border/40 space-y-s-12">
+            <a href="https://api.mailflow.io" target="_blank" rel="noopener noreferrer" className="flex items-center gap-s-10 text-s-13 text-accent hover:text-accent/80 transition-colors no-underline py-s-8">
+              <span>API Playground</span>
+              <span className="text-s-10">↗</span>
+            </a>
+            <a href="mailto:support@mailflow.io" className="flex items-center gap-s-10 text-s-13 text-accent hover:text-accent/80 transition-colors no-underline py-s-8">
+              <span>Get Support</span>
+              <span className="text-s-10">↗</span>
+            </a>
+          </div>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 px-s-40 py-s-80 lg:py-s-100">
-          <div className="max-w-s-900 mx-auto">
+          <div className="max-w-s-1100 mx-auto">
             {selectedContent && (
               <>
-                <div className="flex items-center gap-s-24 mb-s-48">
-                  <div className="w-s-56 h-s-56 bg-accent/10 rounded-s-12 flex items-center justify-center text-accent">
-                    {selectedContent.icon}
-                  </div>
-                  <h1 className="text-s-48 font-bold">{selectedContent.title}</h1>
+                {/* Breadcrumb */}
+                <div className="flex items-center gap-s-12 text-s-13 text-text-muted mb-s-40">
+                  <span>Documentation</span>
+                  <span className="text-text-muted/50">→</span>
+                  <span className="text-accent font-semibold">{selectedContent.title}</span>
                 </div>
 
-                <div className="prose prose-invert max-w-none">
+                {/* Content Header */}
+                <div className="mb-s-60">
+                  <div className="flex items-start gap-s-24 mb-s-32">
+                    <div className="w-s-64 h-s-64 bg-accent/15 rounded-s-14 flex items-center justify-center text-accent flex-shrink-0">
+                      {selectedContent.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h1 className="text-s-56 font-black text-text-primary mb-s-12 leading-tight">{selectedContent.title}</h1>
+                      <p className="text-s-16 text-text-secondary">Learn everything you need to know about {selectedContent.title.toLowerCase()}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="prose prose-invert max-w-none mb-s-80">
                   <div 
-                    className="space-y-s-32 text-text-secondary leading-relaxed"
+                    className="text-text-secondary"
                     dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(selectedContent.content) }}
                   />
                 </div>
 
-                {/* Navigation */}
-                <div className="mt-s-100 pt-s-48 border-t border-border flex items-center justify-between">
-                  <button
-                    onClick={() => {
-                      const currentIndex = DOCS_SECTIONS.findIndex(s => s.id === selectedSection);
-                      if (currentIndex > 0) {
-                        setSelectedSection(DOCS_SECTIONS[currentIndex - 1].id);
-                      }
-                    }}
-                    className="px-s-24 py-s-12 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-s-8"
-                  >
-                    ← Previous
-                  </button>
-                  <button
-                    onClick={() => {
-                      const currentIndex = DOCS_SECTIONS.findIndex(s => s.id === selectedSection);
-                      if (currentIndex < DOCS_SECTIONS.length - 1) {
-                        setSelectedSection(DOCS_SECTIONS[currentIndex + 1].id);
-                      }
-                    }}
-                    className="px-s-24 py-s-12 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-s-8"
-                  >
-                    Next →
-                  </button>
+                {/* Navigation Buttons */}
+                <div className="border-t border-border/40 pt-s-60">
+                  <div className="flex items-center justify-between gap-s-24">
+                    {currentIndex > 0 ? (
+                      <button
+                        onClick={() => setSelectedSection(DOCS_SECTIONS[currentIndex - 1].id)}
+                        className="flex-1 px-s-32 py-s-18 border border-border rounded-s-12 text-text-secondary hover:text-text-primary hover:border-accent/40 transition-all flex items-center justify-center gap-s-8 text-s-14 font-semibold group"
+                      >
+                        <span className="text-s-16 group-hover:translate-x-[-4px] transition-transform">←</span>
+                        <span>{DOCS_SECTIONS[currentIndex - 1].title}</span>
+                      </button>
+                    ) : (
+                      <div />
+                    )}
+                    
+                    {currentIndex < DOCS_SECTIONS.length - 1 ? (
+                      <button
+                        onClick={() => setSelectedSection(DOCS_SECTIONS[currentIndex + 1].id)}
+                        className="flex-1 px-s-32 py-s-18 bg-accent/20 border border-accent/40 text-accent hover:bg-accent/30 transition-all rounded-s-12 flex items-center justify-center gap-s-8 text-s-14 font-semibold group"
+                      >
+                        <span>{DOCS_SECTIONS[currentIndex + 1].title}</span>
+                        <span className="text-s-16 group-hover:translate-x-[4px] transition-transform">→</span>
+                      </button>
+                    ) : (
+                      <div />
+                    )}
+                  </div>
                 </div>
               </>
             )}
@@ -323,13 +369,14 @@ export default function DocsPage() {
 
 function convertMarkdownToHtml(content: string): string {
   return content
-    .replace(/<h3>(.*?)<\/h3>/g, '<h2 class="text-s-32 font-bold text-text-primary mt-s-48 mb-s-24">$1</h2>')
+    .replace(/<h3>(.*?)<\/h3>/g, '<h2 class="text-s-32 font-bold text-text-primary mt-s-48 mb-s-20">$1</h2>')
     .replace(/<h4>(.*?)<\/h4>/g, '<h3 class="text-s-20 font-bold text-text-primary mt-s-32 mb-s-16">$1</h3>')
-    .replace(/<h5>(.*?)<\/h5>/g, '<h4 class="text-s-16 font-bold text-text-primary mt-s-24 mb-s-12">$1</h4>')
-    .replace(/<p>(.*?)<\/p>/g, '<p class="text-s-14 text-text-secondary mb-s-16 leading-relaxed">$1</p>')
-    .replace(/<pre>(.*?)<\/pre>/g, '<pre class="bg-bg-card border border-border rounded-s-8 p-s-16 overflow-x-auto mb-s-24 text-s-12 font-mono text-text-secondary"><code>$1</code></pre>')
-    .replace(/<ol>(.*?)<\/ol>/g, '<ol class="list-decimal list-inside space-y-s-12 mb-s-24 text-s-14">$1</ol>')
-    .replace(/<ul>(.*?)<\/ul>/g, '<ul class="list-disc list-inside space-y-s-12 mb-s-24 text-s-14">$1</ul>')
+    .replace(/<h5>(.*?)<\/h5>/g, '<h4 class="text-s-16 font-bold text-accent mt-s-24 mb-s-12">$1</h4>')
+    .replace(/<p>(.*?)<\/p>/g, '<p class="text-s-15 text-text-secondary mb-s-20 leading-relaxed">$1</p>')
+    .replace(/<pre>(.*?)<\/pre>/g, '<pre class="bg-bg-card/80 border-2 border-accent/60 rounded-s-16 p-s-28 overflow-x-auto mb-s-28 text-s-13 font-mono text-info/95 leading-relaxed relative group hover:border-accent/80 transition-all"><code>$1</code></pre>')
+    .replace(/<ol>(.*?)<\/ol>/g, '<ol class="list-decimal list-inside space-y-s-12 mb-s-24 text-s-15 text-text-secondary pl-s-8">$1</ol>')
+    .replace(/<ul>(.*?)<\/ul>/g, '<ul class="list-disc list-inside space-y-s-12 mb-s-24 text-s-15 text-text-secondary pl-s-8">$1</ul>')
     .replace(/<li>(.*?)<\/li>/g, '<li class="text-text-secondary">$1</li>')
-    .replace(/<strong>(.*?)<\/strong>/g, '<strong class="font-bold text-text-primary">$1</strong>');
+    .replace(/<strong>(.*?)<\/strong>/g, '<strong class="font-semibold text-text-primary">$1</strong>')
+    .replace(/<em>(.*?)<\/em>/g, '<em class="italic text-accent/80">$1</em>');
 }
