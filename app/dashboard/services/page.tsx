@@ -10,6 +10,7 @@ import { EditServiceModal } from './EditServiceModal';
 import { ConfigServiceModal } from './ConfigServiceModal';
 import { smtpApi, ServiceDef } from '@/lib/api';
 import type { SmtpService } from '@/lib/interface';
+import Image from 'next/image';
 
 
 export default function ServicesPage() {
@@ -58,7 +59,8 @@ export default function ServicesPage() {
     }
   };
 
-  const getProviderLogo = (provider: string) => {
+  const getProviderLogo = (provider?: string) => {
+    if (!provider || provider.toLowerCase() === 'smtp') return ''; // Empty string forces onError to show SVG
     if (provider.toLowerCase() === 'gmail') {
        return 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png';
     }
@@ -66,7 +68,8 @@ export default function ServicesPage() {
     return `/${provider.toLowerCase()}.png`;
   };
 
-  const getProviderName = (provider: string) => {
+  const getProviderName = (provider?: string) => {
+    if (!provider) return 'SMTP Server';
     if (provider.toLowerCase() === 'gmail') return 'Gmail';
     return provider.charAt(0).toUpperCase() + provider.slice(1);
   };
@@ -114,22 +117,30 @@ export default function ServicesPage() {
       ) : (
         <div className="flex flex-col gap-s-16">
           {services.map((service) => (
-            <Card key={service.id} className="flex items-center justify-between p-s-16 bg-bg-card border-border hoverable">
+            <Card key={(service as any)._id || service.id || Math.random()} className="flex items-center justify-between p-s-16 bg-bg-card border-border hoverable">
               <div className="flex items-center gap-s-24">
                 <div className="w-s-40 h-s-40 shrink-0 flex items-center justify-center bg-white rounded-s-8 p-s-8 shadow-sm">
-                  <img 
-                    src={getProviderLogo(service.provider)} 
-                    alt={service.provider} 
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                       (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
-                    }}
-                  />
+                  {getProviderLogo(service.provider) ? (
+                    <Image 
+                      src={getProviderLogo(service.provider)} 
+                      alt={service.provider} 
+                      width={24}
+                      height={24}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                         const target = e.target as HTMLImageElement;
+                         target.srcset = '';
+                         target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
+                      }}
+                    />
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5c5c78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  )}
                 </div>
                 <div className="flex flex-col gap-s-4">
                   <span className="text-s-16 font-semibold text-text-primary">{service.name || getProviderName(service.provider)}</span>
                   <span className="text-s-12 text-text-secondary">
-                    Service ID: <span className="font-bold text-text-primary">{service.id}</span>
+                    Service ID: <span className="font-bold text-text-primary">{(service as any)._id || service.id}</span>
                   </span>
                 </div>
               </div>
@@ -155,7 +166,7 @@ export default function ServicesPage() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        setOpenMenuId(openMenuId === service.id ? null : service.id);
+                        setOpenMenuId(openMenuId === ((service as any)._id || service.id) ? null : ((service as any)._id || service.id));
                       }}
                       className="service-menu-trigger flex items-center justify-center w-s-32 h-s-32 rounded-s-4 border border-border text-text-secondary hover:bg-bg-hover hover:text-text-primary transition-colors cursor-pointer"
                     >
@@ -165,19 +176,19 @@ export default function ServicesPage() {
                     {openMenuId === service.id && (
                       <div className="absolute right-0 top-full mt-s-4 w-s-160 bg-bg-card border border-border rounded-s-8 shadow-xl z-20 overflow-hidden animate-in fade-in zoom-in duration-100 origin-top-right transition-all">
                         <button 
-                          onClick={(e) => { e.stopPropagation(); copyToClipboard(service.id); }}
+                          onClick={(e) => { e.stopPropagation(); copyToClipboard((service as any)._id || service.id); }}
                           className="w-full text-left px-s-16 py-s-10 text-s-13 text-text-primary hover:bg-bg-hover transition-colors font-medium border-b border-border/50 cursor-pointer"
                         >
                           Copy Service ID
                         </button>
                         <button 
-                          onClick={(e) => { e.stopPropagation(); if(!service.isDefault) handleSetDefault(service.id); }}
+                          onClick={(e) => { e.stopPropagation(); if(!service.isDefault) handleSetDefault((service as any)._id || service.id); }}
                           className={`w-full text-left px-s-16 py-s-10 text-s-13 transition-colors font-medium border-b border-border/50 ${service.isDefault ? 'text-text-muted cursor-not-allowed opacity-50' : 'text-text-primary hover:bg-bg-hover cursor-pointer'}`}
                         >
                           Set as Default
                         </button>
                         <button 
-                          onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); console.log("Testing service:", service.id); }}
+                          onClick={(e) => { e.stopPropagation(); setOpenMenuId(null); console.log("Testing service:", (service as any)._id || service.id); }}
                           className="w-full text-left px-s-16 py-s-10 text-s-13 text-text-primary hover:bg-bg-hover transition-colors font-medium cursor-pointer"
                         >
                           Test Service

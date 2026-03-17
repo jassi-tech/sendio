@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { servicesApi, ServiceDef, smtpApi } from '@/lib/api';
 import type { ConfigServiceModalProps } from '@/lib/interface';
+import Image from 'next/image';
 
 
 export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: ConfigServiceModalProps) {
@@ -60,19 +61,32 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
   };
 
   const handleCreate = async () => {
-    if (!name.trim()) return;
+    if (!name.trim())
+       {
+    alert('Name is required');
+    return;
+  }
+  if (!connectedEmail) {
+    alert('Please connect your Google account first');
+    return;
+  }
+  if (!fromEmail.trim()) {
+    alert('From email is required');
+    return;
+  }
 
     try {
       setCreating(true);
       
       const payload = {
+         serviceId,
         label: name,
         provider: serviceDef.id,
         host: serviceDef.smtpHost || '',
         port: serviceDef.smtpPort || 587,
         secure: serviceDef.smtpSecure ?? true,
         user: connectedEmail || '',
-        password: '••••••••', // Simulated password for connection (OAuth token could be used here)
+        password:" ", // Simulated password for connection (OAuth token could be used here)
         isDefault: false,
         sendTest: testEmail,
         fromName: fromName || name, // Fallback to service name if not provided
@@ -118,14 +132,22 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
           {/* Top Info Section */}
           <div className="flex items-center gap-s-16 p-s-24 border-b border-border-dim">
             <div className="w-s-48 h-s-48 shrink-0 flex items-center justify-center bg-white rounded-s-8 p-s-8 border border-border">
-              <img 
-                src={getProviderLogo()} 
-                alt={serviceDef.name} 
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
-                }}
-              />
+              {getProviderLogo() ? (
+                <Image 
+                  src={getProviderLogo()} 
+                  alt={serviceDef.name} 
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.srcset = '';
+                    target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
+                  }}
+                />
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5c5c78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              )}
             </div>
             <div className="flex flex-col gap-s-4">
               <span className="text-s-16 font-bold text-text-primary">{serviceDef.name}</span>

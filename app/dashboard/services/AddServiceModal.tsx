@@ -5,6 +5,7 @@ import { X, HelpCircle, Loader2 } from 'lucide-react';
 import { ServiceDef, servicesApi } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import type { AddServiceModalProps } from '@/lib/interface';
+import Image from 'next/image';
 
 
 export function AddServiceModal({ isOpen, onClose, onSelect }: AddServiceModalProps) {
@@ -36,7 +37,8 @@ export function AddServiceModal({ isOpen, onClose, onSelect }: AddServiceModalPr
   const transactionalServices = services.filter((s) => s.category === 'transactional');
 
   const getProviderLogo = (service: ServiceDef) => {
-    return service.logoUrl || `/${service.id.toLowerCase()}.png`;
+    // Only use explicit logoUrl — never fall back to a local PNG that may not exist
+    return service.logoUrl || '';
   };
 
   const ServiceCard = ({ service }: { service: ServiceDef }) => (
@@ -55,15 +57,24 @@ export function AddServiceModal({ isOpen, onClose, onSelect }: AddServiceModalPr
           <div className="text-[#5c5c78] flex flex-col items-center">
              <span className="font-bold text-s-12">SMTP</span>
           </div>
-        ) : (
-          <img 
-            src={getProviderLogo(service)} 
+        ) : service.logoUrl ? (
+          <Image 
+            src={service.logoUrl} 
             alt={service.name} 
+            width={24}
+            height={24}
             className="w-full h-full object-contain"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
+              // Add a fallback class or handling here if Next/Image fails, though it handles it better 
+              const target = e.target as HTMLImageElement;
+              target.srcset = ''; // Clear srcset
+              target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
             }}
           />
+        ) : (
+          <div className="text-[#5c5c78] flex flex-col items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5c5c78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
         )}
       </div>
       <span className={`text-s-12 font-medium text-center whitespace-nowrap ${service.isSelectable ? 'text-text-primary' : 'text-text-secondary line-through'}`}>{service.name}</span>
