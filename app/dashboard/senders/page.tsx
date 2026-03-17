@@ -32,15 +32,30 @@ export default function SendersPage() {
   };
 
   const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(false);
+    e.preventDefault();
+    
+    // Validation
+    if (!form.label || !form.host || !form.user || !form.password || !form.fromName || !form.fromEmail) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
     try {
       setSaving(true);
-      const newCfg = await smtpApi.save({ ...form, port: Number(form.port) });
+      const newCfg = await smtpApi.save({ 
+        ...form, 
+        port: Number(form.port),
+        provider: 'smtp' // Required by backend validation
+      });
       setConfigs((prev) => [newCfg as SmtpConfig, ...prev]);
-      setShowForm(false); setForm({ label: '', host: '', port: '587', secure: false, user: '', password: '', fromName: '', fromEmail: '', isDefault: false });
+      setShowForm(false); 
+      setForm({ label: '', host: '', port: '587', secure: false, user: '', password: '', fromName: '', fromEmail: '', isDefault: false });
       setTestResult(null);
-    } catch (e: any) { alert(e.message); }
-    finally { setSaving(false); }
+    } catch (e: any) { 
+      alert(e.message || 'Failed to save configuration'); 
+    } finally { 
+      setSaving(false); 
+    }
   };
 
   const handleDelete = async (id: string) => {
