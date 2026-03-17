@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 // ──────────────────────────────────────────────
 // Auth
@@ -25,7 +25,7 @@ export interface AuthCtx {
 export interface ServiceDef {
   id: string;
   name: string;
-  category: 'personal' | 'transactional';
+  category: "personal" | "transactional";
   smtpHost?: string;
   smtpPort?: number;
   smtpSecure?: boolean;
@@ -55,7 +55,7 @@ export interface Stat {
   label: string;
   value: number;
   icon: React.ElementType;
-  variant: 'success' | 'error' | 'warning' | 'accent' | 'info';
+  variant: "success" | "error" | "warning" | "accent" | "info";
 }
 
 // ──────────────────────────────────────────────
@@ -63,27 +63,29 @@ export interface Stat {
 // ──────────────────────────────────────────────
 export interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'success' | 'warning' | 'error' | 'info' | 'accent' | 'neutral';
+  variant?: "success" | "warning" | "error" | "info" | "accent" | "neutral";
   icon?: React.ReactNode;
   className?: string;
 }
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "secondary" | "danger" | "ghost" | "outline";
+  size?: "sm" | "md" | "lg";
   loading?: boolean;
   icon?: React.ReactNode;
 }
 
 export interface CardProps {
   children: React.ReactNode;
-  variant?: 'solid' | 'glass' | 'elevated';
+  variant?: "solid" | "glass" | "elevated";
   className?: string;
   padded?: boolean;
   hoverable?: boolean;
 }
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
+export interface InputProps extends React.InputHTMLAttributes<
+  HTMLInputElement | HTMLTextAreaElement
+> {
   label?: string;
   error?: string;
   multiline?: boolean;
@@ -116,7 +118,7 @@ export interface ApiKeySmtpConfig {
 // ──────────────────────────────────────────────
 // Logs
 // ──────────────────────────────────────────────
-export type Status = 'queued' | 'sending' | 'sent' | 'failed';
+export type Status = "queued" | "sending" | "sent" | "failed";
 
 export interface LogItem {
   _id: string;
@@ -137,6 +139,7 @@ export interface LogItem {
 export interface SmtpService {
   id: string;
   provider: string;
+  serviceId?: string;
   name?: string;
   isDefault?: boolean;
 }
@@ -144,13 +147,13 @@ export interface SmtpService {
 export interface AddServiceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (service: import('./interface').ServiceDef) => void;
+  onSelect: (service: import("./interface").ServiceDef) => void;
 }
 
 export interface ConfigServiceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  serviceDef: import('./interface').ServiceDef | null;
+  serviceDef: import("./interface").ServiceDef | null;
   onCreated?: () => void;
 }
 
@@ -177,4 +180,3 @@ export interface Template {
 export interface FullTemplate extends Template {
   html: string;
 }
-

@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { authApi, setToken as persistToken, clearToken } from './api';
-import type { User, AuthCtx } from './interface';
+import { authApi, setToken as persistToken, clearToken } from '../lib/api';
+import type { User, AuthCtx } from '../lib/interface';
 
 const Ctx = createContext<AuthCtx>({ user: null, loading: true, login: async () => {}, logout: () => {}, fetchUser: async () => {} });
 

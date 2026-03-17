@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/context/AuthContext';
 
 export function Navbar() {
   const { user, loading } = useAuth();

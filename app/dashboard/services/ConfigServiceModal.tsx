@@ -1,30 +1,45 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { X, HelpCircle, Check, Search } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { servicesApi, ServiceDef, smtpApi } from '@/lib/api';
-import type { ConfigServiceModalProps } from '@/lib/interface';
-import Image from 'next/image';
+import React, { useState } from "react";
+import { X, HelpCircle, Check, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { servicesApi, ServiceDef, smtpApi } from "@/lib/api";
+import type { ConfigServiceModalProps } from "@/lib/interface";
+import Image from "next/image";
+import { useServiceContext } from "@/context/ServiceContext";
 
-
-export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: ConfigServiceModalProps) {
-  const [name, setName] = useState('');
-  const [serviceId, setServiceId] = useState('');
+export function ConfigServiceModal({
+  isOpen,
+  onClose,
+  serviceDef,
+  onCreated,
+}: ConfigServiceModalProps) {
+  const [name, setName] = useState("");
+  const [serviceId, setServiceId] = useState("");
   const [creating, setCreating] = useState(false);
   const [testEmail, setTestEmail] = useState(true);
   const [showGoogleSignIn, setShowGoogleSignIn] = useState(false);
   const [connectedEmail, setConnectedEmail] = useState<string | null>(null);
-  const [fromName, setFromName] = useState('');
-  const [fromEmail, setFromEmail] = useState('');
+  const [fromName, setFromName] = useState("");
+  const [fromEmail, setFromEmail] = useState("");
   // Initialize name and stable ID
+
+  const { setActiveServiceId } = useServiceContext();
+
   React.useEffect(() => {
     if (isOpen && serviceDef) {
-      setName(serviceDef.name || '');
-      setServiceId(`${serviceDef.id}_${Math.random().toString(36).substring(7)}`);
+      setName(serviceDef.name || "");
+      const newId = `${serviceDef.id}_${Math.random().toString(36).substring(2, 7)}`;
+      setServiceId(newId);
+      setActiveServiceId(newId);
     }
   }, [isOpen, serviceDef]);
+
+  const handleClose = () => {
+    setActiveServiceId(null);
+    onClose();
+  };
 
   if (!isOpen || !serviceDef) return null;
 
@@ -33,64 +48,63 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
     const height = 600;
     const left = window.screenX + (window.outerWidth - width) / 2;
     const top = window.screenY + (window.outerHeight - height) / 2;
-    
+
     // Use the backend URL directly
     // Use the backend URL directly - matching the Google Console config
-    const authUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/auth/google`;
-    
+    const authUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/auth/google`;
+
     const popup = window.open(
       authUrl,
-      'google-auth',
-      `width=${width},height=${height},left=${left},top=${top}`
+      "google-auth",
+      `width=${width},height=${height},left=${left},top=${top}`,
     );
 
     const messageListener = (event: MessageEvent) => {
       // For production, check event.origin here
-      if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
+      if (event.data?.type === "GOOGLE_AUTH_SUCCESS") {
         const { user } = event.data.data;
         setConnectedEmail(user.email);
         setFromEmail(user.email);
         if (user.name) {
           setFromName(user.name);
         }
-        window.removeEventListener('message', messageListener);
+        window.removeEventListener("message", messageListener);
       }
     };
 
-    window.addEventListener('message', messageListener);
+    window.addEventListener("message", messageListener);
   };
 
   const handleCreate = async () => {
-    if (!name.trim())
-       {
-    alert('Name is required');
-    return;
-  }
-  if (!connectedEmail) {
-    alert('Please connect your Google account first');
-    return;
-  }
-  if (!fromEmail.trim()) {
-    alert('From email is required');
-    return;
-  }
+    if (!name.trim()) {
+      alert("Name is required");
+      return;
+    }
+    if (!connectedEmail) {
+      alert("Please connect your Google account first");
+      return;
+    }
+    if (!fromEmail.trim()) {
+      alert("From email is required");
+      return;
+    }
 
     try {
       setCreating(true);
-      
+
       const payload = {
-         serviceId,
-        label: name,
+        serviceId,
+        name: name,
         provider: serviceDef.id,
-        host: serviceDef.smtpHost || '',
+        host: serviceDef.smtpHost || "",
         port: serviceDef.smtpPort || 587,
         secure: serviceDef.smtpSecure ?? true,
-        user: connectedEmail || '',
-        password:" ", // Simulated password for connection (OAuth token could be used here)
+        user: connectedEmail || "",
+        password: " ", // Simulated password for connection (OAuth token could be used here)
         isDefault: false,
         sendTest: testEmail,
         fromName: fromName || name, // Fallback to service name if not provided
-        fromEmail: fromEmail || connectedEmail || ''
+        fromEmail: fromEmail || connectedEmail || "",
       };
 
       await smtpApi.save(payload);
@@ -98,7 +112,7 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
       if (onCreated) onCreated();
       onClose();
     } catch (error) {
-      console.error('Failed to create service:', error);
+      console.error("Failed to create service:", error);
     } finally {
       setCreating(false);
     }
@@ -108,10 +122,21 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
     return serviceDef.logoUrl || `/${serviceDef.id.toLowerCase()}.png`;
   };
 
-  const categoryText = serviceDef.category === 'transactional' ? 'Transactional Service' : 'Personal Service';
+  const categoryText =
+    serviceDef.category === "transactional"
+      ? "Transactional Service"
+      : "Personal Service";
   // Mocking the limit per day as per design for Gmail
-  const limitText = serviceDef.id === 'gmail' ? '500 emails per day' : 'Limit depends on provider';
+  const limitText =
+    serviceDef.id === "gmail"
+      ? "500 emails per day"
+      : "Limit depends on provider";
 
+  const regenerateServiceId = () => {
+    const newId = `${serviceDef.id}_${Math.random().toString(36).substring(2, 7)}`;
+    setServiceId(newId);
+    setActiveServiceId(newId); // ← update context too
+  };
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-s-16 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="bg-bg-base rounded-s-8 shadow-2xl w-full max-w-2xl overflow-hidden border border-border animate-slide-up flex flex-col max-h-[90vh]">
@@ -119,7 +144,7 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
         <div className="flex items-center justify-between p-s-16 bg-[#4f6ebf] text-white">
           <h2 className="text-s-14 font-semibold">Config Service</h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="p-s-4 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X size={18} />
@@ -128,35 +153,53 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
 
         {/* Body */}
         <div className="flex flex-col flex-1 overflow-y-auto custom-scrollbar bg-bg-base text-text-primary">
-          
           {/* Top Info Section */}
           <div className="flex items-center gap-s-16 p-s-24 border-b border-border-dim">
             <div className="w-s-48 h-s-48 shrink-0 flex items-center justify-center bg-white rounded-s-8 p-s-8 border border-border">
               {getProviderLogo() ? (
-                <Image 
-                  src={getProviderLogo()} 
-                  alt={serviceDef.name} 
+                <Image
+                  src={getProviderLogo()}
+                  alt={serviceDef.name}
                   width={32}
                   height={32}
                   className="w-full h-full object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.srcset = '';
-                    target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
+                    target.srcset = "";
+                    target.src =
+                      'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
                   }}
                 />
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5c5c78" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#5c5c78"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
               )}
             </div>
             <div className="flex flex-col gap-s-4">
-              <span className="text-s-16 font-bold text-text-primary">{serviceDef.name}</span>
+              <span className="text-s-16 font-bold text-text-primary">
+                {serviceDef.name}
+              </span>
               <div className="flex items-center gap-s-8 text-s-12 text-text-secondary">
                 <span>{categoryText}</span>
                 <span className="w-s-4 h-s-4 rounded-full bg-border"></span>
                 <span className="flex items-center gap-s-4">
                   {limitText}
-                  <HelpCircle size={12} className="cursor-help opacity-70 hover:opacity-100 transition-opacity" />
+                  <HelpCircle
+                    size={12}
+                    className="cursor-help opacity-70 hover:opacity-100 transition-opacity"
+                  />
                 </span>
               </div>
             </div>
@@ -164,11 +207,11 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
 
           {/* Form Fields Section */}
           <div className="p-s-24 flex flex-col gap-s-24">
-            
             {/* Name Input */}
-            <Input 
+            <Input
               label="Name *"
               value={name}
+              readOnly
               onChange={(e) => setName(e.target.value)}
               placeholder={`e.g. My ${serviceDef.name}`}
             />
@@ -177,15 +220,16 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
             {connectedEmail && (
               <div className="flex gap-s-16">
                 <div className="flex-1">
-                  <Input 
+                  <Input
                     label="From Name"
                     value={fromName}
+                    readOnly
                     onChange={(e) => setFromName(e.target.value)}
                     placeholder="e.g. Acme Support"
                   />
                 </div>
                 <div className="flex-1">
-                  <Input 
+                  <Input
                     label="From Email"
                     value={fromEmail}
                     onChange={(e) => setFromEmail(e.target.value)}
@@ -197,53 +241,61 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
 
             {/* Service ID Input (Readonly for preview/mock) */}
             <div>
-               <label className="block text-s-12 font-semibold text-text-secondary mb-s-6 ml-s-2">
-                 Service ID <span className="text-error">*</span>
-               </label>
-               <div className="relative">
-                 <input 
-                   type="text"
-                   value={serviceId}
-                   readOnly
-                   className="w-full bg-bg-elevated border border-border rounded-s-8 text-text-primary text-s-14 outline-none px-s-14 py-s-11 pr-s-40"
-                 />
-                 <div className="absolute right-s-12 top-1/2 -translate-y-1/2 text-text-muted">
-                   <Search size={16} />
-                 </div>
-               </div>
+              <label className="block text-s-12 font-semibold text-text-secondary mb-s-6 ml-s-2">
+                Service ID <span className="text-error">*</span>
+              </label>
+              <div className="relative">
+                <Input
+                  type="text"
+                  value={serviceId}
+                  readOnly
+                  className="w-full bg-bg-elevated border border-border rounded-s-8 text-text-primary text-s-14 outline-none px-s-14 py-s-11 pr-s-40"
+                />
+                <button
+                  type="button"
+                  onClick={regenerateServiceId}
+                  title="Generate new Service ID"
+                  className="absolute right-s-12 top-1/2 -translate-y-1/2 text-text-muted hover:text-accent transition-colors cursor-pointer hover:rotate-180 duration-300"
+                >
+                  <RefreshCw size={16} />
+                </button>
+              </div>
             </div>
 
             {/* Connect Button or Status */}
             <div className="flex flex-col gap-s-8">
-               <label className="block text-s-12 font-semibold text-text-secondary ml-s-2">
-                 {serviceDef.name} Connect
-               </label>
-               
-               {connectedEmail ? (
-                 <div className="flex items-center justify-between p-s-16 border border-border rounded-s-12 bg-bg-card">
-                   <span className="text-s-14 text-text-primary">
-                     Connected as <span className="font-semibold text-accent">{connectedEmail}</span>
-                   </span>
-                   <Button 
-                    variant="outline" 
-                    size="sm" 
+              <label className="block text-s-12 font-semibold text-text-secondary ml-s-2">
+                {serviceDef.name} Connect
+              </label>
+
+              {connectedEmail ? (
+                <div className="flex items-center justify-between p-s-16 border border-border rounded-s-12 bg-bg-card">
+                  <span className="text-s-14 text-text-primary">
+                    Connected as{" "}
+                    <span className="font-semibold text-accent">
+                      {connectedEmail}
+                    </span>
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="h-auto py-s-6"
                     onClick={() => setConnectedEmail(null)}
-                   >
-                     Disconnect
-                   </Button>
-                 </div>
-               ) : (
-                 <div>
-                   <Button 
-                     variant="primary" 
-                     className="h-auto py-s-10 px-s-24 text-s-14"
-                     onClick={handleGoogleSignIn}
-                   >
-                     Sign in with Google
-                   </Button>
-                 </div>
-               )}
+                  >
+                    Disconnect
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <Button
+                    variant="primary"
+                    className="h-auto py-s-10 px-s-24 text-s-14"
+                    onClick={handleGoogleSignIn}
+                  >
+                    Sign in with Google
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Info Message */}
@@ -251,40 +303,43 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
               <div className="mt-s-2 text-accent">
                 <HelpCircle size={16} />
               </div>
-              <p className="text-s-13 text-text-secondary leading-relaxed">
-                Allow "Send email on your behalf" permission during connection.<br/>
-                Both {serviceDef.name} and Google Apps accounts are supported.
+              <p className="text-sm text-text-secondary leading-relaxed">
+                Please allow the &quot;Send email on your behalf&quot;
+                permission when connecting.
+                <br />
+                Both {serviceDef.name} and Google Workspace accounts are
+                supported.
               </p>
             </div>
 
             {/* Test Email Checkbox */}
             <div className="flex flex-col gap-s-16 mt-s-8 ml-s-2">
               <label className="flex items-center gap-s-12 cursor-pointer group">
-                <div className={`w-s-20 h-s-20 rounded-s-6 border flex items-center justify-center transition-all ${testEmail ? 'bg-accent border-accent shadow-accent-glow' : 'border-border group-hover:border-accent'}`}>
+                <div
+                  className={`w-s-20 h-s-20 rounded-s-6 border flex items-center justify-center transition-all ${testEmail ? "bg-accent border-accent shadow-accent-glow" : "border-border group-hover:border-accent"}`}
+                >
                   {testEmail && <Check size={14} className="text-white" />}
                 </div>
-                <input 
-                  type="checkbox" 
-                  className="hidden" 
+                <input
+                  type="checkbox"
+                  className="hidden"
                   checked={testEmail}
                   onChange={() => setTestEmail(!testEmail)}
                 />
-                <span className="text-s-14 text-text-secondary group-hover:text-text-primary transition-colors font-medium">Send test email to verify configuration</span>
+                <span className="text-s-14 text-text-secondary group-hover:text-text-primary transition-colors font-medium">
+                  Send test email to verify configuration
+                </span>
               </label>
             </div>
-            
           </div>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-s-12 p-s-16 border-t border-border bg-bg-card">
-          <Button 
-            variant="ghost"
-            onClick={onClose}
-          >
+          <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
+          <Button
             variant="primary"
             onClick={handleCreate}
             loading={creating}
@@ -294,8 +349,6 @@ export function ConfigServiceModal({ isOpen, onClose, serviceDef, onCreated }: C
           </Button>
         </div>
       </div>
-
-      
     </div>
   );
 }

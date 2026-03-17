@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/lib/AuthContext';
 import { authApi } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';

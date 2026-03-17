@@ -140,7 +140,7 @@ export default function ServicesPage() {
                 <div className="flex flex-col gap-s-4">
                   <span className="text-s-16 font-semibold text-text-primary">{service.name || getProviderName(service.provider)}</span>
                   <span className="text-s-12 text-text-secondary">
-                    Service ID: <span className="font-bold text-text-primary">{(service as any)._id || service.id}</span>
+                    Service ID: <span className="font-bold text-text-primary">{service.serviceId || service._id || service.id}</span>
                   </span>
                 </div>
               </div>
