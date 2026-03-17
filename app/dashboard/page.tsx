@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Send, CheckCircle, XCircle, Clock, Server, Key, ArrowRight, Activity } from 'lucide-react';
 import { logsApi, smtpApi, keysApi } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import type { Stat } from '@/lib/interface';
 
 export default function OverviewPage() {
+  const router = useRouter();
   const [stats, setStats] = useState({ sent: 0, failed: 0, queued: 0, senders: 0, keys: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -107,7 +109,7 @@ export default function OverviewPage() {
                 key={item.text} 
                 variant="secondary" 
                 className="w-full justify-between group/btn text-s-14 font-bold"
-                onClick={() => window.location.href = item.text}
+                onClick={() => router.push(item.href)}
               >
                 <div className="flex items-center gap-s-12">
                   <span className="w-s-24 h-s-24 rounded-full bg-bg-base border border-border flex items-center justify-center text-s-11 text-accent">
@@ -130,7 +132,13 @@ export default function OverviewPage() {
             <p className="text-text-secondary text-s-14 max-w-s-300">
                Once you start sending, delivery performance charts will appear here.
             </p>
-            <Button variant="primary" size="sm" className="mt-s-24" icon={<Key size={14} />}>
+            <Button 
+              variant="primary" 
+              size="sm" 
+              className="mt-s-24" 
+              icon={<Key size={14} />}
+              onClick={() => router.push('/dashboard/apikeys')}
+            >
                Get Your API Keys
             </Button>
 
