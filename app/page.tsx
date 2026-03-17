@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { Mail, Shield, Zap, Send, Server, ArrowRight, Code2, Lock } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/context/AuthContext';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 

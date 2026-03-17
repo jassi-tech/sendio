@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LayoutDashboard, Server, FileCode2, Key, ScrollText, LogOut, Mail, Menu, X, Zap
 } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { logsApi } from '@/lib/api';
 
