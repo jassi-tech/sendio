@@ -3,7 +3,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, XCircle, Mail } from 'lucide-react';
 import { authApi } from '@/lib/api';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 function VerifyContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
