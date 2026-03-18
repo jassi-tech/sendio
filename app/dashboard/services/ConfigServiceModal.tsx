@@ -8,6 +8,7 @@ import { servicesApi, ServiceDef, smtpApi } from "@/lib/api";
 import type { ConfigServiceModalProps } from "@/lib/interface";
 import Image from "next/image";
 import { useServiceContext } from "@/context/ServiceContext";
+import { handleGoogleSignIn } from "@/helper";
 
 export function ConfigServiceModal({
   isOpen,
@@ -43,38 +44,6 @@ export function ConfigServiceModal({
 
   if (!isOpen || !serviceDef) return null;
 
-  const handleGoogleSignIn = () => {
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    // Use the backend URL directly
-    // Use the backend URL directly - matching the Google Console config
-    const authUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/auth/google`;
-
-    const popup = window.open(
-      authUrl,
-      "google-auth",
-      `width=${width},height=${height},left=${left},top=${top}`,
-    );
-
-    const messageListener = (event: MessageEvent) => {
-      // For production, check event.origin here
-      if (event.data?.type === "GOOGLE_AUTH_SUCCESS") {
-        const { user } = event.data.data;
-        setConnectedEmail(user.email);
-        setFromEmail(user.email);
-        if (user.name) {
-          setFromName(user.name);
-        }
-        window.removeEventListener("message", messageListener);
-      }
-    };
-
-    window.addEventListener("message", messageListener);
-  };
-
   const handleCreate = async () => {
     if (!name.trim()) {
       alert("Name is required");
@@ -94,7 +63,7 @@ export function ConfigServiceModal({
 
       const payload = {
         serviceId,
-        name: name,
+        label: name,
         provider: serviceDef.id,
         host: serviceDef.smtpHost || "",
         port: serviceDef.smtpPort || 587,
@@ -143,12 +112,14 @@ export function ConfigServiceModal({
         {/* Header matching the screenshot */}
         <div className="flex items-center justify-between p-s-16 bg-[#4f6ebf] text-white">
           <h2 className="text-s-14 font-semibold">Config Service</h2>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleClose}
             className="p-s-4 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         {/* Body */}
@@ -211,7 +182,6 @@ export function ConfigServiceModal({
             <Input
               label="Name *"
               value={name}
-              readOnly
               onChange={(e) => setName(e.target.value)}
               placeholder={`e.g. My ${serviceDef.name}`}
             />
@@ -232,6 +202,7 @@ export function ConfigServiceModal({
                   <Input
                     label="From Email"
                     value={fromEmail}
+                    readOnly
                     onChange={(e) => setFromEmail(e.target.value)}
                     placeholder="e.g. support@acme.com"
                   />
@@ -290,7 +261,7 @@ export function ConfigServiceModal({
                   <Button
                     variant="primary"
                     className="h-auto py-s-10 px-s-24 text-s-14"
-                    onClick={handleGoogleSignIn}
+                    onClick={() => handleGoogleSignIn({ setConnectedEmail, setFromEmail, setFromName })}
                   >
                     Sign in with Google
                   </Button>

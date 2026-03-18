@@ -1,21 +1,30 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
+"use client";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import {
-  LayoutDashboard, Server, FileCode2, Key, ScrollText, LogOut, Mail, Menu, X, Zap
-} from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/Button';
-import { logsApi } from '@/lib/api';
+  LayoutDashboard,
+  Server,
+  FileCode2,
+  Key,
+  ScrollText,
+  LogOut,
+  Mail,
+  Menu,
+  X,
+  Zap,
+} from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/Button";
+import { logsApi } from "@/lib/api";
 
 const navItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
-  { href: '/dashboard/services', icon: Server, label: 'Services' },
-  { href: '/dashboard/senders', icon: Server, label: 'Senders' },
-  { href: '/dashboard/templates', icon: FileCode2, label: 'Templates' },
-  { href: '/dashboard/logs', icon: ScrollText, label: 'Logs' },
-  { href: '/dashboard/account', icon: Key, label: 'Account' }, // Reusing Key icon for now as in reference image or User icon if available
+  { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
+  { href: "/dashboard/services", icon: Server, label: "Services" },
+  { href: "/dashboard/senders", icon: Server, label: "Senders" },
+  { href: "/dashboard/templates", icon: FileCode2, label: "Templates" },
+  { href: "/dashboard/logs", icon: ScrollText, label: "Logs" },
+  { href: "/dashboard/account", icon: Key, label: "Account" }, // Reusing Key icon for now as in reference image or User icon if available
 ];
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
@@ -25,7 +34,8 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
 
   useEffect(() => {
     if (user) {
-      logsApi.list({ limit: 1, status: 'sent' })
+      logsApi
+        .list({ limit: 1, status: "sent" })
         .then((res: any) => {
           setSentCount(res.pagination?.total ?? 0);
         })
@@ -34,7 +44,8 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
   }, [user]);
 
   const totalQuota = 200;
-  const requestsLeft = sentCount !== null ? Math.max(0, totalQuota - sentCount) : '...';
+  const requestsLeft =
+    sentCount !== null ? Math.max(0, totalQuota - sentCount) : "...";
 
   return (
     <>
@@ -43,7 +54,9 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         <div className="w-s-48 h-s-48 bg-gradient-to-br from-accent to-accent-dim rounded-s-12 flex items-center justify-center shadow-accent-glow">
           <Mail className="w-s-24 h-s-24 text-white" />
         </div>
-        <span className="text-s-24 font-black text-text-primary tracking-tight">MailFlow</span>
+        <span className="text-s-24 font-black text-text-primary tracking-tight">
+          MailFlow
+        </span>
       </div>
 
       {/* Navigation */}
@@ -57,8 +70,8 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
               onClick={() => onClose?.()}
               className={`flex items-center gap-s-16 p-s-16 rounded-s-12 text-s-16 transition-all no-underline font-medium ${
                 isActive
-                  ? 'text-accent bg-accent/10 shadow-[inset_s-2_0_0_0_currentColor]'
-                  : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
+                  ? "text-accent bg-accent/10 shadow-[inset_s-2_0_0_0_currentColor]"
+                  : "text-text-secondary hover:bg-bg-hover hover:text-text-primary"
               }`}
             >
               <Icon className="w-s-20 h-s-20" />
@@ -76,17 +89,20 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           </div>
           <div className="min-w-0">
             <div className="text-s-13 font-bold text-text-primary truncate">
-              Requests Left: <span className="text-accent">{requestsLeft.toLocaleString()}</span>
+              Requests Left:{" "}
+              <span className="text-accent">
+                {requestsLeft.toLocaleString()}
+              </span>
             </div>
             <div className="text-s-11 text-text-muted truncate">
               {user?.email}
             </div>
           </div>
         </div>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
+
+        <Button
+          variant="outline"
+          size="sm"
           className="w-full hover:border-error hover:text-error hover:bg-error/5"
           onClick={logout}
           icon={<LogOut className="w-s-14 h-s-14" />}
@@ -105,7 +121,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !user) router.replace('/auth');
+    if (!loading && !user) router.replace("/auth");
   }, [user, loading, router]);
 
   if (loading || !user) {
@@ -125,24 +141,28 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* Mobile Sidebar Drawer */}
-      <aside className={`
+      <aside
+        className={`
         fixed top-0 left-0 bottom-0 h-full w-s-280 bg-bg-card z-50 lg:hidden transform transition-transform duration-300 ease-out flex flex-col
-        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+      >
         <div className="absolute top-s-16 right-s-16">
-          <button 
+          <Button
+            size="sm"
+            variant="ghost"
             onClick={() => setIsMobileMenuOpen(false)}
             className="p-s-8 text-text-secondary hover:text-text-primary"
           >
             <X className="w-s-24 h-s-24" />
-          </button>
+          </Button>
         </div>
         <SidebarContent onClose={() => setIsMobileMenuOpen(false)} />
       </aside>
@@ -151,30 +171,33 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0 relative">
         {/* Top bar (for breadcrumbs or mobile toggle) */}
         <header className="h-s-72 border-b border-border bg-bg-base/80 backdrop-blur-md sticky top-0 z-10 px-s-20 flex items-center lg:px-s-40">
-          <button 
+          <Button
+            variant="ghost"
             onClick={() => setIsMobileMenuOpen(true)}
             className="lg:hidden p-s-10 -ml-s-10 text-text-secondary hover:text-text-primary transition-colors"
           >
             <Menu className="w-s-24 h-s-24" />
-          </button>
-          
+          </Button>
+
           <div className="flex-1 flex items-center justify-between ml-s-16 lg:ml-0">
             <div className="flex items-center gap-s-8 text-s-20 font-bold">
               <span className="text-text-secondary">Welcome,</span>
-              <span className="text-accent">{user?.email?.split('@')[0] || 'User'}</span>
+              <span className="text-accent">
+                {user?.email?.split("@")[0] || "User"}
+              </span>
             </div>
 
             <div className="flex items-center gap-s-24">
-              <Link 
-                href="/docs" 
-                target="_blank" 
+              <Link
+                href="/docs"
+                target="_blank"
                 className="text-s-20 font-medium text-text-secondary hover:text-accent transition-colors no-underline flex items-center gap-s-6"
               >
                 Doc
               </Link>
-              <Link 
-                href="/support" 
-                target="_blank" 
+              <Link
+                href="/support"
+                target="_blank"
                 className="text-s-20 font-medium text-text-secondary hover:text-accent transition-colors no-underline flex items-center gap-s-6"
               >
                 Support
@@ -184,19 +207,17 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="flex-1 overflow-y-auto p-s-20 md:p-s-32 lg:p-s-40">
-          <div className="max-w-s-1200 mx-auto">
-            {children}
-          </div>
+          <div className="max-w-s-1200 mx-auto">{children}</div>
         </main>
       </div>
     </div>
   );
 }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <DashboardShell>{children}</DashboardShell>
-  );
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <DashboardShell>{children}</DashboardShell>;
 }
-
-
