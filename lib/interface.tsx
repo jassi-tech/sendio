@@ -106,13 +106,15 @@ export interface ApiKeyItem {
   isActive: boolean;
   lastUsedAt?: string;
   createdAt: string;
-  smtpConfigId: { label: string; fromEmail: string } | null;
+  smtpConfigId: { label: string; fromEmail: string; serviceId?: string } | null;
+  templateId: { name: string; templateId: string } | null;
 }
 
 export interface ApiKeySmtpConfig {
   _id: string;
   label: string;
   fromEmail: string;
+  serviceId?: string;
 }
 
 // ──────────────────────────────────────────────

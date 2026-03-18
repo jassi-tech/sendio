@@ -48,12 +48,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #3a3a50;
+    background: #6c63ff;
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #6c63ff;
+    background: #3a3a50;
   }
 
   /* Design colors mapped to CSS variables */

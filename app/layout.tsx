@@ -9,6 +9,9 @@ export const metadata: Metadata = {
     "User-owned SMTP email platform – send transactional emails through your own credentials.",
 };
 
+import { ToastProvider } from "@/context/ToastContext";
+import { Toaster } from "@/components/ui/Toaster";
+
 export default function RootLayout({
   children,
 }: {
@@ -29,8 +32,14 @@ export default function RootLayout({
         />
       </head>
       <body style={{ fontFamily: "Inter, sans-serif" }}>
-        <AuthProvider>{children}</AuthProvider>
-        <ServiceProvider>{children}</ServiceProvider>
+        <AuthProvider>
+          <ServiceProvider>
+            <ToastProvider>
+              <Toaster />
+              {children}
+            </ToastProvider>
+          </ServiceProvider>
+        </AuthProvider>
       </body>
     </html>
   );
