@@ -17,6 +17,38 @@ export default function TemplatesPage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: '', subject: '', html: '' });
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [editorMode, setEditorMode] = useState<'code' | 'visual'>('code');
+
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data.type === 'VISUAL_SYNC') {
+        const newHtml = e.data.html;
+        setForm(prev => {
+          if (prev.html === newHtml) return prev;
+          return { ...prev, html: newHtml };
+        });
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  const injectVisualScript = (html: string) => {
+    if (!html) return '';
+    const script = `
+<script>
+  window.onload = () => {
+    document.body.contentEditable = true;
+    document.body.style.minHeight = '100vh';
+    document.body.oninput = () => {
+      window.parent.postMessage({ type: 'VISUAL_SYNC', html: document.body.innerHTML }, '*');
+    };
+    // Ensure links don't fire
+    document.querySelectorAll('a').forEach(a => a.onclick = (e) => e.preventDefault());
+  };
+</script>`;
+    return html + script;
+  };
 
   const copyToClipboard = (id: string) => {
     navigator.clipboard.writeText(id);
@@ -44,7 +76,7 @@ export default function TemplatesPage() {
   const openEdit = async (t: Template) => {
     try {
       setLoading(true);
-      const full = await templatesApi.get(t._id) as FullTemplate;
+      const full = await templatesApi.get(t.templateId) as FullTemplate;
       setEditing(full); 
       setForm({ name: full.name, subject: full.subject, html: full.html }); 
       setShowForm(true);
@@ -57,8 +89,8 @@ export default function TemplatesPage() {
     e.preventDefault(); setSaving(true);
     try {
       if (editing) {
-        const updated = await templatesApi.update(editing._id, form) as FullTemplate;
-        setTemplates((prev) => prev.map((t) => t._id === editing._id ? updated : t));
+        const updated = await templatesApi.update(editing.templateId as string, form) as FullTemplate;
+        setTemplates((prev) => prev.map((t) => t.templateId === editing.templateId ? updated : t));
       } else {
         const created = await templatesApi.create(form) as FullTemplate;
         setTemplates((prev) => [created, ...prev]);
@@ -71,7 +103,7 @@ export default function TemplatesPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this template?')) return;
     await templatesApi.delete(id);
-    setTemplates((prev) => prev.filter((t) => t._id !== id));
+    setTemplates((prev) => prev.filter((t) => t.templateId !== id));
   };
 
   // Editor View Component
@@ -142,10 +174,24 @@ export default function TemplatesPage() {
 
               {/* Right Pane - Preview */}
               <div className="flex-1 bg-white flex flex-col overflow-hidden w-full lg:w-1/2 relative min-h-[600px]">
-                <div className="absolute top-0 inset-x-0 h-s-40 bg-gray-100 flex items-center justify-center border-b border-gray-200 shadow-sm z-10">
+                <div className="absolute top-0 inset-x-0 h-s-40 bg-gray-100 flex items-center justify-between px-s-16 border-b border-gray-200 shadow-sm z-10">
                   <span className="text-s-12 font-semibold text-gray-500 uppercase tracking-widest flex items-center gap-s-6">
-                    <Layout size={14} /> Live Canvas Preview
+                    <Layout size={14} /> {editorMode === 'visual' ? 'Visual Editor' : 'Live Canvas Preview'}
                   </span>
+                  <div className="flex bg-white border border-gray-300 rounded-s-8 p-s-2">
+                    <button 
+                      onClick={() => setEditorMode('code')}
+                      className={`px-s-10 py-s-4 text-[10px] font-bold uppercase rounded-s-6 transition-all ${editorMode === 'code' ? 'bg-accent text-white' : 'text-gray-400 hover:text-gray-600'}`}
+                    >
+                      Preview
+                    </button>
+                    <button 
+                      onClick={() => setEditorMode('visual')}
+                      className={`px-s-10 py-s-4 text-[10px] font-bold uppercase rounded-s-6 transition-all ${editorMode === 'visual' ? 'bg-success text-white' : 'text-gray-400 hover:text-gray-600'}`}
+                    >
+                      Edit Visual
+                    </button>
+                  </div>
                 </div>
                 <div className="flex-1 mt-s-40 overflow-auto bg-gray-50 preview-bg-pattern">
                   <div className="min-h-full p-s-32 flex justify-center items-start">
@@ -167,7 +213,11 @@ export default function TemplatesPage() {
                        </div>
                        <div className="flex-1 relative min-h-[400px]">
                          {form.html ? (
-                           <iframe srcDoc={form.html} className="absolute inset-0 w-full h-full border-none bg-white font-sans" title="preview" />
+                           <iframe 
+                             srcDoc={editorMode === 'visual' ? injectVisualScript(form.html) : form.html} 
+                             className={`absolute inset-0 w-full h-full border-none bg-white font-sans ${editorMode === 'visual' ? 'ring-2 ring-success/20' : ''}`} 
+                             title="preview" 
+                           />
                          ) : (
                            <div className="absolute inset-0 flex items-center justify-center text-gray-300 flex-col gap-s-16">
                              <Globe size={64} className="opacity-10" />
@@ -232,7 +282,7 @@ export default function TemplatesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-s-24">
           {templates.map((t) => (
-            <Card key={t._id} padded className="group transition-all hover:border-accent hover:-translate-y-s-4 flex flex-col relative overflow-hidden">
+            <Card key={t.templateId} padded className="group transition-all hover:border-accent hover:-translate-y-s-4 flex flex-col relative overflow-hidden">
                {/* Accent line on hover */}
                <div className="absolute top-0 left-0 w-full h-s-2 bg-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
                
@@ -243,7 +293,7 @@ export default function TemplatesPage() {
                  <div className="flex gap-s-8">
                    <Button variant="ghost" size="sm" onClick={() => openEdit(t)} icon={<Edit3 size={18} />} className="hover:bg-accent/10 hover:text-accent rounded-full w-s-36 h-s-36 p-0" />
                    {!t.isDefault && (
-                     <Button variant="ghost" size="sm" onClick={() => handleDelete(t._id)} icon={<Trash2 size={18} />} className="hover:text-error hover:bg-error/5 rounded-full w-s-36 h-s-36 p-0" />
+                     <Button variant="ghost" size="sm" onClick={() => handleDelete(t.templateId)} icon={<Trash2 size={18} />} className="hover:text-error hover:bg-error/5 rounded-full w-s-36 h-s-36 p-0" />
                    )}
                  </div>
                </div>

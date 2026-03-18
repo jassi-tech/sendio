@@ -168,7 +168,7 @@ export interface EditServiceModalProps {
 // Templates
 // ──────────────────────────────────────────────
 export interface Template {
-  _id: string;
+  _id?: string;
   templateId: string;
   name: string;
   subject: string;
