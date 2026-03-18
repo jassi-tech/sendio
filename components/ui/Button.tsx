@@ -27,6 +27,7 @@ export const Button = ({
     sm: 'px-s-12 py-s-6 text-s-12 rounded-s-6 gap-s-6',
     md: 'px-s-18 py-s-10 text-s-14 rounded-s-8 gap-s-8',
     lg: 'px-s-24 py-s-14 text-s-16 rounded-s-10 gap-s-10',
+    icon: 'p-s-8 rounded-s-6',
   };
 
   return (

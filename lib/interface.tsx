@@ -19,6 +19,12 @@ export interface AuthCtx {
   fetchUser: () => Promise<void>;
 }
 
+export interface GoogleAuthCallbacks {
+  setConnectedEmail: (email: string) => void;
+  setFromEmail?: (email: string) => void;
+  setFromName?: (name: string) => void;
+}
+
 // ──────────────────────────────────────────────
 // Services (SMTP providers catalogue)
 // ──────────────────────────────────────────────
@@ -70,7 +76,7 @@ export interface BadgeProps {
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "danger" | "ghost" | "outline";
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "icon";
   loading?: boolean;
   icon?: React.ReactNode;
 }
@@ -139,10 +145,12 @@ export interface LogItem {
 // Services
 // ──────────────────────────────────────────────
 export interface SmtpService {
+  _id?: string;
   id: string;
   provider: string;
   serviceId?: string;
-  name?: string;
+  user?: string;
+  label?: string;
   isDefault?: boolean;
 }
 

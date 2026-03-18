@@ -5,7 +5,8 @@ import { X, HelpCircle, Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { servicesApi, ServiceDef, smtpApi } from "@/lib/api";
-import type { SmtpService, EditServiceModalProps } from "@/lib/interface";
+import type { EditServiceModalProps } from "@/lib/interface";
+import { handleGoogleSignIn } from "@/helper";
 
 export function EditServiceModal({
   isOpen,
@@ -17,11 +18,14 @@ export function EditServiceModal({
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [connectedEmail, setConnectedEmail] = useState<string | null>(null);
+  const [disconnecting, setDisconnecting] = useState(false);
   const [testEmail, setTestEmail] = useState(true);
 
   useEffect(() => {
     if (isOpen && service) {
-      setName(service.name || "");
+      setName(service.label || "");
+      setConnectedEmail(service.user || null);
       fetchProviderDef(service.provider);
     }
   }, [isOpen, service]);
@@ -41,10 +45,23 @@ export function EditServiceModal({
 
   if (!isOpen || !service) return null;
 
+  const handleDisconnect = async () => {
+    try {
+      setDisconnecting(true);
+      await smtpApi.update(service.id, { user: "", fromEmail: "" });
+      setConnectedEmail(null);
+    } catch (error) {
+      console.error("Failed to disconnect:", error);
+    } finally {
+      setDisconnecting(false);
+    }
+  };
+
   const handleUpdate = async () => {
+    if (!service._id) return;
     try {
       setUpdating(true);
-      await smtpApi.update(service.id, { label: name });
+      await smtpApi.update(service._id, { label: name });
       console.log("Update service:", { id: service.id, name, testEmail });
 
       if (onUpdate) onUpdate();
@@ -83,12 +100,14 @@ export function EditServiceModal({
         {/* Header matching the screenshot */}
         <div className="flex items-center justify-between p-s-16 bg-[#4f6ebf] text-white">
           <h2 className="text-s-14 font-semibold">Edit Service</h2>
-          <button
+          <Button
+            size="sm"
+            variant="ghost"
             onClick={onClose}
             className="p-s-4 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         {/* Body */}
@@ -148,7 +167,8 @@ export function EditServiceModal({
                  text-text-primary text-s-14 outline-none px-s-14 py-s-11 
                  pr-s-40 cursor-not-allowed opacity-70"
                 />
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() =>
                     navigator.clipboard.writeText(
                       service.serviceId || service.id,
@@ -158,7 +178,7 @@ export function EditServiceModal({
                  hover:text-text-secondary transition-colors cursor-pointer p-s-4"
                 >
                   <Copy size={16} />
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -168,17 +188,49 @@ export function EditServiceModal({
                 {providerName} Connect
               </label>
 
-              <div className="flex items-center justify-between p-s-16 border border-border rounded-s-12 bg-bg-card">
-                <span className="text-s-14 text-text-primary">
-                  Connected as{" "}
-                  <span className="font-semibold text-accent">
-                    jasleendashboard@gmail.com
+              {connectedEmail ? (
+                <>
+                  <div className="flex items-center justify-between p-s-16 border border-border rounded-s-12 bg-bg-card">
+                    <div className="flex flex-col gap-s-4">
+                      <span className="text-s-14 text-text-primary">
+                        Connected as{" "}
+                        <span className="font-semibold text-accent">
+                          {connectedEmail}
+                        </span>
+                      </span>
+                      <span className="text-s-11 text-text-muted text-green-800">
+                        ● Active connection
+                      </span>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-auto py-s-6 text-red-400 border-red-400/30 hover:bg-red-400/10 hover:border-red-400"
+                      onClick={() => {
+                        handleDisconnect();
+                      }}
+                    >
+                      Disconnect
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                // Not connected — show reconnect option
+                <div className="flex items-center justify-between p-s-16 border border-border border-dashed rounded-s-12 bg-bg-card">
+                  <span className="text-s-14 text-text-secondary">
+                    No account connected
                   </span>
-                </span>
-                <Button variant="outline" size="sm" className="h-auto py-s-6">
-                  Disconnect
-                </Button>
-              </div>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="h-auto py-s-6"
+                    onClick={() => handleGoogleSignIn({ setConnectedEmail })}
+                  >
+                    Reconnect
+                  </Button>
+                </div>
+              )}
 
               <div className="flex gap-s-12 p-s-16 bg-bg-elevated/40 border border-border rounded-s-12 mt-s-4">
                 <div className="mt-s-2 text-accent">
