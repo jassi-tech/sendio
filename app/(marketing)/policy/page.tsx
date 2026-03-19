@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
-import { ChevronDown, ExternalLink } from 'lucide-react';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import React, { useState } from "react";
+import { ChevronDown, ExternalLink } from "lucide-react";
 
 const POLICIES = [
   {
-    id: 'privacy',
-    title: 'Privacy Policy',
-    lastUpdated: 'March 1, 2026',
+    id: "privacy",
+    title: "Privacy Policy",
+    lastUpdated: "March 1, 2026",
     content: `
       <h3>Privacy Policy</h3>
       <p>Last updated: March 1, 2026</p>
@@ -55,12 +53,12 @@ const POLICIES = [
       
       <h4>6. Contact Us</h4>
       <p>For privacy concerns, email: privacy@mailflow.com</p>
-    `
+    `,
   },
   {
-    id: 'terms',
-    title: 'Terms of Service',
-    lastUpdated: 'March 1, 2026',
+    id: "terms",
+    title: "Terms of Service",
+    lastUpdated: "March 1, 2026",
     content: `
       <h3>Terms of Service</h3>
       <p>Last updated: March 1, 2026</p>
@@ -96,12 +94,12 @@ const POLICIES = [
       
       <h4>7. Termination</h4>
       <p>We may terminate accounts that violate these terms or engage in illegal activity.</p>
-    `
+    `,
   },
   {
-    id: 'cookies',
-    title: 'Cookie Policy',
-    lastUpdated: 'March 1, 2026',
+    id: "cookies",
+    title: "Cookie Policy",
+    lastUpdated: "March 1, 2026",
     content: `
       <h3>Cookie Policy</h3>
       <p>Last updated: March 1, 2026</p>
@@ -130,12 +128,12 @@ const POLICIES = [
       
       <h4>5. Opt-Out Options</h4>
       <p>You can opt out of marketing cookies while still using the site. Essential cookies cannot be disabled.</p>
-    `
+    `,
   },
   {
-    id: 'acceptable-use',
-    title: 'Acceptable Use Policy',
-    lastUpdated: 'March 1, 2026',
+    id: "acceptable-use",
+    title: "Acceptable Use Policy",
+    lastUpdated: "March 1, 2026",
     content: `
       <h3>Acceptable Use Policy</h3>
       <p>Last updated: March 1, 2026</p>
@@ -172,17 +170,15 @@ const POLICIES = [
         <li>Permanent termination</li>
         <li>Legal action if necessary</li>
       </ul>
-    `
+    `,
   },
 ];
 
 export default function PolicyPage() {
-  const [expandedPolicy, setExpandedPolicy] = useState('privacy');
+  const [expandedPolicy, setExpandedPolicy] = useState("privacy");
 
   return (
-    <div className="min-h-screen max-w-7xl mx-auto bg-bg-base text-text-primary">
-      <Navbar />
-
+    <div className=" max-w-7xl mx-auto bg-bg-base text-text-primary">
       {/* Hero Section */}
       <section className="pt-s-120 pb-s-80 px-s-40">
         <div className="max-w-s-1000 mx-auto text-center">
@@ -190,7 +186,8 @@ export default function PolicyPage() {
             Legal & <span className="gradient-text">Policy Documents</span>
           </h1>
           <p className="text-s-18 text-text-secondary max-w-s-700 mx-auto leading-relaxed">
-            Transparency is important to us. Read our policies to understand how we protect your data and operate our service.
+            Transparency is important to us. Read our policies to understand how
+            we protect your data and operate our service.
           </p>
         </div>
       </section>
@@ -203,16 +200,24 @@ export default function PolicyPage() {
               <div
                 key={policy.id}
                 className="card hover:border-text-muted/50 transition-all cursor-pointer overflow-hidden"
-                onClick={() => setExpandedPolicy(expandedPolicy === policy.id ? '' : policy.id)}
+                onClick={() =>
+                  setExpandedPolicy(
+                    expandedPolicy === policy.id ? "" : policy.id,
+                  )
+                }
               >
                 <div className="p-s-32 flex items-center justify-between">
                   <div>
-                    <h3 className="text-s-20 font-bold text-text-primary mb-s-4">{policy.title}</h3>
-                    <p className="text-s-12 text-text-muted">Last updated: {policy.lastUpdated}</p>
+                    <h3 className="text-s-20 font-bold text-text-primary mb-s-4">
+                      {policy.title}
+                    </h3>
+                    <p className="text-s-12 text-text-muted">
+                      Last updated: {policy.lastUpdated}
+                    </p>
                   </div>
                   <ChevronDown
                     className={`w-s-24 h-s-24 text-text-muted flex-shrink-0 transition-transform ${
-                      expandedPolicy === policy.id ? 'rotate-180' : ''
+                      expandedPolicy === policy.id ? "rotate-180" : ""
                     }`}
                   />
                 </div>
@@ -221,7 +226,9 @@ export default function PolicyPage() {
                   <div className="px-s-32 pb-s-32 text-s-14 text-text-secondary leading-relaxed border-t border-border pt-s-24">
                     <div
                       className="space-y-s-16"
-                      dangerouslySetInnerHTML={{ __html: convertHtmlToStyledHtml(policy.content) }}
+                      dangerouslySetInnerHTML={{
+                        __html: convertHtmlToStyledHtml(policy.content),
+                      }}
                     />
                   </div>
                 )}
@@ -234,23 +241,34 @@ export default function PolicyPage() {
       {/* Additional Information */}
       <section className="py-s-100 px-s-40 bg-bg-card/30">
         <div className="max-w-s-1000 mx-auto">
-          <h2 className="text-s-40 font-bold mb-s-64 text-center">Legal Information</h2>
+          <h2 className="text-s-40 font-bold mb-s-64 text-center">
+            Legal Information
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-s-32">
             <div className="card p-s-32">
-              <h3 className="text-s-20 font-bold mb-s-16">Contact Our Legal Team</h3>
+              <h3 className="text-s-20 font-bold mb-s-16">
+                Contact Our Legal Team
+              </h3>
               <p className="text-s-14 text-text-secondary mb-s-24">
-                Have questions about our policies? Get in touch with our legal team.
+                Have questions about our policies? Get in touch with our legal
+                team.
               </p>
-              <a href="mailto:legal@mailflow.com" className="text-accent text-s-14 font-bold hover:underline flex items-center gap-s-8">
+              <a
+                href="mailto:legal@mailflow.com"
+                className="text-accent text-s-14 font-bold hover:underline flex items-center gap-s-8"
+              >
                 legal@mailflow.com <ExternalLink className="w-s-12 h-s-12" />
               </a>
             </div>
 
             <div className="card p-s-32">
-              <h3 className="text-s-20 font-bold mb-s-16">Compliance & Certifications</h3>
+              <h3 className="text-s-20 font-bold mb-s-16">
+                Compliance & Certifications
+              </h3>
               <p className="text-s-14 text-text-secondary mb-s-24">
-                We maintain industry-leading compliance standards for your protection.
+                We maintain industry-leading compliance standards for your
+                protection.
               </p>
               <ul className="space-y-s-8 text-s-13 text-text-secondary">
                 <li>✓ SOC 2 Type II Certified</li>
@@ -261,18 +279,34 @@ export default function PolicyPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }
 
 function convertHtmlToStyledHtml(html: string): string {
   return html
-    .replace(/<h3>(.*?)<\/h3>/g, '<h2 class="text-s-24 font-bold text-text-primary mt-s-32 mb-s-16">$1</h2>')
-    .replace(/<h4>(.*?)<\/h4>/g, '<h3 class="text-s-16 font-bold text-text-primary mt-s-24 mb-s-12">$1</h3>')
-    .replace(/<p>(.*?)<\/p>/g, '<p class="text-s-13 text-text-secondary mb-s-12 leading-relaxed">$1</p>')
-    .replace(/<ul>(.*?)<\/ul>/g, '<ul class="list-disc list-inside space-y-s-8 mb-s-16 ml-s-16">$1</ul>')
-    .replace(/<li>(.*?)<\/li>/g, '<li class="text-s-13 text-text-secondary">$1</li>')
-    .replace(/<strong>(.*?)<\/strong>/g, '<strong class="font-bold text-text-primary">$1</strong>');
+    .replace(
+      /<h3>(.*?)<\/h3>/g,
+      '<h2 class="text-s-24 font-bold text-text-primary mt-s-32 mb-s-16">$1</h2>',
+    )
+    .replace(
+      /<h4>(.*?)<\/h4>/g,
+      '<h3 class="text-s-16 font-bold text-text-primary mt-s-24 mb-s-12">$1</h3>',
+    )
+    .replace(
+      /<p>(.*?)<\/p>/g,
+      '<p class="text-s-13 text-text-secondary mb-s-12 leading-relaxed">$1</p>',
+    )
+    .replace(
+      /<ul>(.*?)<\/ul>/g,
+      '<ul class="list-disc list-inside space-y-s-8 mb-s-16 ml-s-16">$1</ul>',
+    )
+    .replace(
+      /<li>(.*?)<\/li>/g,
+      '<li class="text-s-13 text-text-secondary">$1</li>',
+    )
+    .replace(
+      /<strong>(.*?)<\/strong>/g,
+      '<strong class="font-bold text-text-primary">$1</strong>',
+    );
 }
