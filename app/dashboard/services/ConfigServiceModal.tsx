@@ -9,6 +9,7 @@ import type { ConfigServiceModalProps } from "@/lib/interface";
 import Image from "next/image";
 import { useServiceContext } from "@/context/ServiceContext";
 import { handleGoogleSignIn } from "@/helper";
+import { useToast } from "@/context/ToastContext";
 
 export function ConfigServiceModal({
   isOpen,
@@ -16,6 +17,7 @@ export function ConfigServiceModal({
   serviceDef,
   onCreated,
 }: ConfigServiceModalProps) {
+  const { showToast } = useToast();
   const [name, setName] = useState("");
   const [serviceId, setServiceId] = useState("");
   const [creating, setCreating] = useState(false);
@@ -24,7 +26,6 @@ export function ConfigServiceModal({
   const [connectedEmail, setConnectedEmail] = useState<string | null>(null);
   const [fromName, setFromName] = useState("");
   const [fromEmail, setFromEmail] = useState("");
-  // Initialize name and stable ID
 
   const { setActiveServiceId } = useServiceContext();
 
@@ -46,15 +47,15 @@ export function ConfigServiceModal({
 
   const handleCreate = async () => {
     if (!name.trim()) {
-      alert("Name is required");
+      showToast("Name is required", "error");
       return;
     }
     if (!connectedEmail) {
-      alert("Please connect your Google account first");
+      showToast("Please connect your Google account", "error");
       return;
     }
     if (!fromEmail.trim()) {
-      alert("From email is required");
+      showToast("From email is required", "error");
       return;
     }
 
@@ -77,11 +78,12 @@ export function ConfigServiceModal({
       };
 
       await smtpApi.save(payload);
+      showToast("Service created successfully", "success");
 
       if (onCreated) onCreated();
       onClose();
-    } catch (error) {
-      console.error("Failed to create service:", error);
+    } catch (error: any) {
+      showToast(error.message || "Failed to create service", "error");
     } finally {
       setCreating(false);
     }
@@ -105,6 +107,7 @@ export function ConfigServiceModal({
     const newId = `${serviceDef.id}_${Math.random().toString(36).substring(2, 7)}`;
     setServiceId(newId);
     setActiveServiceId(newId); // ← update context too
+    showToast("Service ID regenerated", "info");
   };
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-s-16 bg-black/60 backdrop-blur-sm animate-fade-in">

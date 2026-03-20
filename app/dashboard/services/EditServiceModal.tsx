@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { servicesApi, ServiceDef, smtpApi } from "@/lib/api";
 import type { EditServiceModalProps } from "@/lib/interface";
 import { handleGoogleSignIn } from "@/helper";
+import { useToast } from "@/context/ToastContext";
 
 export function EditServiceModal({
   isOpen,
@@ -14,6 +15,7 @@ export function EditServiceModal({
   service,
   onUpdate,
 }: EditServiceModalProps) {
+  const { showToast } = useToast();
   const [providerDef, setProviderDef] = useState<ServiceDef | null>(null);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,8 +52,9 @@ export function EditServiceModal({
       setDisconnecting(true);
       await smtpApi.update(service.id, { user: "", fromEmail: "" });
       setConnectedEmail(null);
-    } catch (error) {
-      console.error("Failed to disconnect:", error);
+      showToast("Service disconnected", "success");
+    } catch (error: any) {
+      showToast(error.message || "Failed to disconnect", "error");
     } finally {
       setDisconnecting(false);
     }
@@ -62,12 +65,12 @@ export function EditServiceModal({
     try {
       setUpdating(true);
       await smtpApi.update(service._id, { label: name });
-      console.log("Update service:", { id: service.id, name, testEmail });
+      showToast("Service updated successfully", "success");
 
       if (onUpdate) onUpdate();
       onClose();
-    } catch (error) {
-      console.error("Failed to update service:", error);
+    } catch (error: any) {
+      showToast(error.message || "Failed to update service", "error");
     } finally {
       setUpdating(false);
     }
@@ -169,11 +172,12 @@ export function EditServiceModal({
                 />
                 <Button
                   variant="ghost"
-                  onClick={() =>
+                  onClick={() => {
                     navigator.clipboard.writeText(
                       service.serviceId || service.id,
-                    )
-                  }
+                    );
+                    showToast("Service ID copied", "success");
+                  }}
                   className="absolute right-s-12 top-1/2 -translate-y-1/2 text-text-muted 
                  hover:text-text-secondary transition-colors cursor-pointer p-s-4"
                 >

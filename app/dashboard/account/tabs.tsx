@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { authApi } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -9,6 +10,7 @@ import { RefreshCw, Trash2, CheckCircle, EyeOff, Eye, Check, X } from 'lucide-re
 import { useRouter } from 'next/navigation';
 
 export function GeneralTab() {
+  const { showToast } = useToast();
   const { user, fetchUser, logout } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -22,9 +24,9 @@ export function GeneralTab() {
       setRefreshing(true);
       await authApi.refreshKeys();
       await fetchUser();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to refresh keys');
+      showToast('API keys refreshed', 'success');
+    } catch (err: any) {
+      showToast(err.message || 'Failed to refresh keys', 'error');
     } finally {
       setRefreshing(false);
     }
@@ -35,10 +37,10 @@ export function GeneralTab() {
     try {
       setDeleting(true);
       await authApi.deleteAccount();
+      showToast('Account deleted successfully', 'success');
       logout();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete account');
+    } catch (err: any) {
+      showToast(err.message || 'Failed to delete account', 'error');
       setDeleting(false);
     }
   };

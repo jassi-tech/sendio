@@ -2,14 +2,15 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Edit3, FileCode2, Loader2, X, Eye, EyeOff, Layout, Globe, Save, Code, Clock, Copy, Check, ArrowLeft } from 'lucide-react';
 import { templatesApi } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import type { Template, FullTemplate } from '@/lib/interface';
 
-
 export default function TemplatesPage() {
+  const { showToast } = useToast();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<FullTemplate | null>(null);
@@ -53,6 +54,7 @@ export default function TemplatesPage() {
   const copyToClipboard = (id: string) => {
     navigator.clipboard.writeText(id);
     setCopiedId(id);
+    showToast('Template ID copied', 'success');
     setTimeout(() => setCopiedId(null), 2000);
   };
 
@@ -63,6 +65,7 @@ export default function TemplatesPage() {
       })
       .catch((err) => {
         console.error('❌ Failed to fetch templates:', err);
+        showToast('Failed to fetch templates', 'error');
       })
       .finally(() => setLoading(false));
   }, []);
@@ -91,19 +94,28 @@ export default function TemplatesPage() {
       if (editing) {
         const updated = await templatesApi.update(editing.templateId as string, form) as FullTemplate;
         setTemplates((prev) => prev.map((t) => t.templateId === editing.templateId ? updated : t));
+        showToast('Template updated', 'success');
       } else {
         const created = await templatesApi.create(form) as FullTemplate;
         setTemplates((prev) => [created, ...prev]);
+        showToast('Template created', 'success');
       }
       setShowForm(false);
-    } catch (err: any) { alert(err.message); }
+    } catch (err: any) { 
+      showToast(err.message || 'Failed to save template', 'error'); 
+    }
     finally { setSaving(false); }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this template?')) return;
-    await templatesApi.delete(id);
-    setTemplates((prev) => prev.filter((t) => t.templateId !== id));
+    try {
+      await templatesApi.delete(id);
+      showToast('Template deleted', 'success');
+      setTemplates((prev) => prev.filter((t) => t.templateId !== id));
+    } catch (err: any) {
+      showToast(err.message || 'Failed to delete template', 'error');
+    }
   };
 
   // Editor View Component

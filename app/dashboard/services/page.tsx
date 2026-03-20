@@ -9,10 +9,12 @@ import { AddServiceModal } from "./AddServiceModal";
 import { EditServiceModal } from "./EditServiceModal";
 import { ConfigServiceModal } from "./ConfigServiceModal";
 import { smtpApi, ServiceDef } from "@/lib/api";
+import { useToast } from "@/context/ToastContext";
 import type { SmtpService } from "@/lib/interface";
 import Image from "next/image";
 
 export default function ServicesPage() {
+  const { showToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<SmtpService | null>(
     null,
@@ -55,6 +57,7 @@ export default function ServicesPage() {
       }
     } catch (error) {
       console.error("Failed to fetch services:", error);
+      showToast("Failed to fetch services", "error");
       setServices([]);
     } finally {
       setLoading(false);
@@ -89,16 +92,17 @@ export default function ServicesPage() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setOpenMenuId(null);
-    // Ideally add a toast here
+    showToast("Service ID copied", "success");
   };
 
   const handleSetDefault = async (serviceId: string) => {
     try {
       await smtpApi.update(serviceId, { isDefault: true });
+      showToast("Default service updated", "success");
       fetchServices();
       setOpenMenuId(null);
-    } catch (error) {
-      console.error("Failed to set default:", error);
+    } catch (error: any) {
+      showToast(error.message || "Failed to set default", "error");
     }
   };
 
@@ -209,9 +213,10 @@ export default function ServicesPage() {
                         if (!confirm("Delete this service?")) return;
                         try {
                           await smtpApi.delete(resolvedId);
+                          showToast("Service deleted", "success");
                           fetchServices();
-                        } catch (error) {
-                          console.error("Failed to delete service:", error);
+                        } catch (error: any) {
+                          showToast(error.message || "Failed to delete", "error");
                         }
                       }}
                       className="flex items-center justify-center w-s-32 h-s-32 rounded-s-4 border border-border text-text-secondary hover:bg-error/10 hover:text-error hover:border-error/20 transition-colors cursor-pointer"

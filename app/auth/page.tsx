@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Mail, Zap, Shield, Send, ArrowLeft } from 'lucide-react';
 import { authApi } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 import Link from 'next/link';
 
 export default function AuthPage() {
@@ -9,6 +10,7 @@ export default function AuthPage() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,8 +19,11 @@ export default function AuthPage() {
     try {
       await authApi.requestMagicLink(email);
       setSent(true);
+      showToast('Sent successfully!', 'success');
     } catch (err: unknown) {
-      setError((err as Error).message || 'Failed to send magic link');
+      const msg = (err as Error).message || 'Failed to send';
+      setError(msg);
+      showToast(msg, 'error');
     } finally {
       setLoading(false);
     }

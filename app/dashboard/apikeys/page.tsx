@@ -86,6 +86,7 @@ export default function ApiKeysPage() {
   const copy = () => {
     navigator.clipboard.writeText(newRawKey);
     setCopied(true);
+    showToast("API key copied", "success");
     setTimeout(() => setCopied(false), 2000);
   };
 

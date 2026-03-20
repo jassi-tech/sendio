@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, CheckCircle, Loader2, Server, Wifi, WifiOff, Star, ShieldCheck, Mail } from 'lucide-react';
 import { smtpApi } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -10,6 +11,7 @@ import { Table, THead, TBody, TR, TH, TD } from '@/components/ui/Table';
 import type { SmtpConfig } from '@/lib/interface';
 
 export default function SendersPage() {
+  const { showToast } = useToast();
   const [configs, setConfigs] = useState<SmtpConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -27,7 +29,11 @@ export default function SendersPage() {
     try {
       await smtpApi.test({ host: form.host, port: Number(form.port), secure: form.secure, user: form.user, password: form.password });
       setTestResult({ ok: true, msg: 'SMTP connection successful!' });
-    } catch (e: any) { setTestResult({ ok: false, msg: e.message }); }
+      showToast('SMTP Connection Successful', 'success');
+    } catch (e: any) { 
+      setTestResult({ ok: false, msg: e.message }); 
+      showToast(e.message || 'Connection Failed', 'error');
+    }
     finally { setTesting(false); }
   };
 
@@ -36,7 +42,7 @@ export default function SendersPage() {
     
     // Validation
     if (!form.label || !form.host || !form.user || !form.password || !form.fromName || !form.fromEmail) {
-      alert('Please fill in all required fields');
+      showToast('Please fill in all required fields', 'error');
       return;
     }
 
@@ -47,12 +53,13 @@ export default function SendersPage() {
         port: Number(form.port),
         provider: 'smtp' // Required by backend validation
       });
+      showToast('Sender profile created', 'success');
       setConfigs((prev) => [newCfg as SmtpConfig, ...prev]);
       setShowForm(false); 
       setForm({ label: '', host: '', port: '587', secure: false, user: '', password: '', fromName: '', fromEmail: '', isDefault: false });
       setTestResult(null);
     } catch (e: any) { 
-      alert(e.message || 'Failed to save configuration'); 
+      showToast(e.message || 'Failed to save configuration', 'error'); 
     } finally { 
       setSaving(false); 
     }
@@ -60,8 +67,13 @@ export default function SendersPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this sender profile?')) return;
-    await smtpApi.delete(id);
-    setConfigs((prev) => prev.filter((c) => c._id !== id));
+    try {
+      await smtpApi.delete(id);
+      showToast('Sender profile deleted', 'success');
+      setConfigs((prev) => prev.filter((c) => c._id !== id));
+    } catch (e: any) {
+      showToast(e.message || 'Failed to delete', 'error');
+    }
   };
 
   return (
