@@ -190,3 +190,29 @@ export interface Template {
 export interface FullTemplate extends Template {
   html: string;
 }
+
+// ──────────────────────────────────────────────
+// Toast
+// ──────────────────────────────────────────────
+
+type ToastType = "success" | "error" | "info" | "warning";
+
+export interface Toast {
+  id: string;
+  message: string;
+  type: ToastType;
+}
+
+export interface ConfirmState {
+  message: string;
+  resolve: (value: boolean) => void;
+}
+
+export interface ToastContextType {
+  showToast: (message: string, type: ToastType) => void;
+  removeToast: (id: string) => void;
+  confirmToast: (message: string) => Promise<boolean>;
+  toasts: Toast[];
+  confirmState: ConfirmState | null; 
+  setConfirmState: (s: ConfirmState | null) => void; 
+}

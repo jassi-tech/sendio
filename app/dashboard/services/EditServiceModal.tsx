@@ -48,9 +48,15 @@ export function EditServiceModal({
   if (!isOpen || !service) return null;
 
   const handleDisconnect = async () => {
+    const serviceMongoId = service?._id || service?.id;
+
+    if (!serviceMongoId) {
+      showToast("Invalid service ID", "error");
+      return;
+    }
     try {
       setDisconnecting(true);
-      await smtpApi.update(service.id, { user: "", fromEmail: "" });
+      await smtpApi.update(serviceMongoId, { user: "", fromEmail: "" });
       setConnectedEmail(null);
       showToast("Service disconnected", "success");
     } catch (error: any) {
@@ -211,9 +217,7 @@ export function EditServiceModal({
                       variant="outline"
                       size="sm"
                       className="h-auto py-s-6 text-red-400 border-red-400/30 hover:bg-red-400/10 hover:border-red-400"
-                      onClick={() => {
-                        handleDisconnect();
-                      }}
+                      onClick={handleDisconnect}
                     >
                       Disconnect
                     </Button>
