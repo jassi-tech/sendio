@@ -6,8 +6,9 @@ import { useToast } from '@/context/ToastContext';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { RefreshCw, Trash2, CheckCircle, EyeOff, Eye, Check, X } from 'lucide-react';
+import { RefreshCw, Trash2, CheckCircle, EyeOff, Eye, Check, X, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { plans } from '@/lib/pricing';
 
 export function GeneralTab() {
   const { showToast } = useToast();
@@ -139,27 +140,60 @@ export function GeneralTab() {
 
 export function SubscriptionTab() {
   const router = useRouter();
+  const { user } = useAuth();
+  
+  const currentPlanId = (user as any)?.planId || 'free';
+  const currentPlan = plans.find((p) => p.id === currentPlanId) || plans[0];
 
   return (
     <Card variant="solid">
-      <h3 className="text-s-16 font-bold mb-s-24 tracking-tight">Subscription Details</h3>
+      <div className="flex items-start justify-between mb-s-24">
+        <div>
+          <h3 className="text-s-16 font-bold mb-s-4 tracking-tight">Subscription Details</h3>
+          <p className="text-s-13 text-text-secondary">Manage your billing and plan details</p>
+        </div>
+        <div className={`px-s-12 py-s-4 rounded-full text-s-11 font-bold uppercase tracking-wider ${
+          currentPlan.id === 'free' ? 'bg-bg-elevated text-text-muted' : 'bg-accent/20 text-accent border border-accent/30'
+        }`}>
+          {currentPlan.name}
+        </div>
+      </div>
       
-      <div className="space-y-s-20 text-s-14 max-w-s-400 mb-s-32">
-        <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border-dim pb-s-12">
+      <div className="space-y-s-20 text-s-14 max-w-s-500 mb-s-32">
+        <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
           <span className="text-text-secondary">Current plan:</span>
-          <span className="font-semibold">Free <span className="text-text-muted font-normal">/ Lifetime</span></span>
+          <span className="font-semibold text-text-primary">
+            {currentPlan.name} 
+            <span className="text-text-muted font-normal ml-s-8">
+              {currentPlan.price === 0 ? '/ Lifetime Free' : currentPlan.price === null ? '/ Custom' : ` / $${currentPlan.price} mo`}
+            </span>
+          </span>
         </div>
-        <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border-dim pb-s-12">
+        <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
           <span className="text-text-secondary">Monthly quota:</span>
-          <span className="font-semibold">200</span>
+          <span className="font-semibold text-text-primary">
+            {currentPlan.features.find((f: string) => f.includes('emails per month'))?.split(' ')[0] || '200'}
+          </span>
         </div>
-        <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border-dim pb-s-12">
-          <span className="text-text-secondary">Remaining quota:</span>
-          <span className="font-semibold">192</span>
+        <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
+          <span className="text-text-secondary">Usage status:</span>
+          <div className="flex flex-col gap-s-8">
+            <span className="font-semibold text-text-primary">96.0% remaining</span>
+            <div className="w-full h-s-6 bg-bg-elevated rounded-full overflow-hidden">
+              <div className="h-full bg-success w-[96%]" />
+            </div>
+          </div>
         </div>
         <div className="grid grid-cols-[1fr_2fr] gap-s-16 pb-s-12">
-          <span className="text-text-secondary">Quota resets on:</span>
-          <span className="font-semibold">logic not created</span>
+          <span className="text-text-secondary">Included features:</span>
+          <div className="flex flex-wrap gap-s-6">
+            {currentPlan.features.slice(0, 4).map((f: string, i: number) => (
+              <span key={i} className="text-s-11 bg-bg-card border border-border px-s-8 py-s-2 rounded-md text-text-secondary">
+                {f}
+              </span>
+            ))}
+            {currentPlan.features.length > 4 && <span className="text-s-11 text-text-muted">+{currentPlan.features.length - 4} more</span>}
+          </div>
         </div>
       </div>
 
@@ -167,12 +201,12 @@ export function SubscriptionTab() {
         <Button 
           variant="primary" 
           size="sm" 
-          icon={<CheckCircle className="w-s-14 h-s-14" />}
+          icon={<Zap className="w-s-14 h-s-14" />}
           onClick={() => router.push('/dashboard/upgrade')}
         >
-          Upgrade
+          {currentPlan.id === 'free' ? 'Upgrade Plan' : 'Change Plan'}
         </Button>
-        <Button variant="ghost" size="sm" className="opacity-50 cursor-not-allowed">
+        <Button variant="ghost" size="sm" className="text-text-muted hover:text-error hover:bg-error/5 border border-transparent hover:border-error/20">
           Cancel Subscription
         </Button>
       </div>

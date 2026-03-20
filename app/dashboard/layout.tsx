@@ -17,6 +17,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { logsApi } from "@/lib/api";
+import { ChatWidget } from "@/components/chatbot/ChatWidget";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
@@ -118,7 +119,6 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     if (!loading && !user) router.replace("/auth");
@@ -210,6 +210,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
           <div className="max-w-s-1200 mx-auto">{children}</div>
         </main>
       </div>
+      <ChatWidget />
     </div>
   );
 }
