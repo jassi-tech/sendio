@@ -14,7 +14,7 @@ import type { SmtpService } from "@/lib/interface";
 import Image from "next/image";
 
 export default function ServicesPage() {
-  const { showToast } = useToast();
+  const { showToast, confirmToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<SmtpService | null>(
     null,
@@ -23,6 +23,8 @@ export default function ServicesPage() {
     useState<ServiceDef | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [services, setServices] = useState<SmtpService[]>([]);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -210,13 +212,23 @@ export default function ServicesPage() {
                       size="icon"
                       variant="ghost"
                       onClick={async () => {
-                        if (!confirm("Delete this service?")) return;
+                        console.log("resolvedId:", resolvedId); // ← add this
+                        console.log("service:", service); // ← and this
+                        const confirmed = await confirmToast(
+                          "This action cannot be undone.",
+                        );
+                        console.log('confirmed:', confirmed);
+                        if (!confirmed) return;
+
                         try {
                           await smtpApi.delete(resolvedId);
                           showToast("Service deleted", "success");
                           fetchServices();
                         } catch (error: any) {
-                          showToast(error.message || "Failed to delete", "error");
+                          showToast(
+                            error.message || "Failed to delete",
+                            "error",
+                          );
                         }
                       }}
                       className="flex items-center justify-center w-s-32 h-s-32 rounded-s-4 border border-border text-text-secondary hover:bg-error/10 hover:text-error hover:border-error/20 transition-colors cursor-pointer"
