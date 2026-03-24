@@ -23,9 +23,9 @@ export const handleGoogleSignIn = ({
     if (event.data?.type === "GOOGLE_AUTH_SUCCESS") {
       const { user } = event.data.data;
       setConnectedEmail(user.email);
-      setFromEmail(user.email);
+      setFromEmail?.(user.email);
       if (user.name) {
-        setFromName(user.name);
+        setFromName?.(user.name);
       }
       window.removeEventListener("message", messageListener);
     }
