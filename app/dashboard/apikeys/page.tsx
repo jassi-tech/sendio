@@ -327,16 +327,27 @@ export default function ApiKeysPage() {
             </THead>
             <TBody>
               {keys.map((k) => (
-                <TR key={k._id} className="group transition-colors hover:bg-bg-elevated/30">
+                <TR key={k._id} className={`group transition-colors ${!k.isActive ? 'opacity-60 bg-bg-elevated/50' : 'hover:bg-bg-elevated/30'}`}>
                   <TD>
                     <div className="flex items-center gap-s-12">
-                      <div className="w-s-40 h-s-40 bg-accent/10 rounded-s-10 flex items-center justify-center text-accent shrink-0 group-hover:bg-accent/20 transition-colors">
-                        <Key size={18} />
+                      <div className="relative shrink-0">
+                        <div className={`w-s-40 h-s-40 rounded-s-10 flex items-center justify-center transition-colors ${
+                          k.isActive ? 'bg-accent/10 text-accent group-hover:bg-accent/20' : 'bg-text-muted/10 text-text-muted'
+                        }`}>
+                          <Key size={18} />
+                        </div>
+                        {/* Status Pulse Dot */}
+                        <div className={`absolute -top-s-1 -right-s-1 w-s-10 h-s-10 rounded-full border-2 border-bg-card ${
+                          k.isActive ? 'bg-success animate-pulse' : 'bg-error'
+                        }`} />
                       </div>
                       <div>
-                        <div className="font-bold text-s-15 text-text-primary tracking-tight">{k.label}</div>
+                        <div className={`font-bold text-s-15 tracking-tight flex items-center gap-s-8 ${k.isActive ? 'text-text-primary' : 'text-text-muted line-through'}`}>
+                          {k.label}
+                          {!k.isActive && <Badge variant="error" className="text-[9px] px-s-4 py-0 uppercase">Deactivated</Badge>}
+                        </div>
                         <div className="flex items-center gap-s-6 text-s-12 font-mono text-text-muted mt-s-2">
-                          <Shield size={10} className="text-success" /> {k.keyPrefix}••••••••
+                          <Shield size={10} className={k.isActive ? "text-success" : "text-text-muted"} /> {k.keyPrefix}••••••••
                         </div>
                       </div>
                     </div>
@@ -351,8 +362,13 @@ export default function ApiKeysPage() {
                           {k.smtpConfigId.fromEmail}
                         </div>
                       </div>
-                    ) : (
+                    ) : k.isActive ? (
                       <Badge variant="neutral">System Managed</Badge>
+                    ) : (
+                      <div className="flex flex-col gap-s-1">
+                        <Badge variant="error" className="w-fit">SERVICE DELETED</Badge>
+                        <span className="text-[10px] text-error/70 font-medium ml-s-2 italic">Invalidated</span>
+                      </div>
                     )}
                   </TD>
                   <TD className="hidden lg:table-cell">
@@ -365,8 +381,10 @@ export default function ApiKeysPage() {
                           {(k.templateId as any).templateId}
                         </div>
                       </div>
-                    ) : (
+                    ) : k.isActive ? (
                       <Badge variant="neutral">None</Badge>
+                    ) : (
+                      <Badge variant="error">TEMPLATE DELETED</Badge>
                     )}
                   </TD>
                   <TD className="hidden lg:table-cell">

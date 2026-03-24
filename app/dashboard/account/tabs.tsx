@@ -120,7 +120,8 @@ export function GeneralTab() {
           Before you go...
         </p>
         <ul className="list-disc list-inside text-s-13 text-text-secondary space-y-s-8 mb-s-24">
-          <li>Please make sure you have canceled your paid subscription.</li>
+          <li>All your data including **API keys, templates, SMTP configs, and logs** will be permanently deleted.</li>
+          <li>You will not be able to create a new account with this email for a short period (cooldown).</li>
           <li>If you have problems with integration, please contact support, we will help you.</li>
           <li>If you are interested in receiving newsletters from us, do not delete your account.</li>
         </ul>
