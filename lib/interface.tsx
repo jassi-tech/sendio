@@ -74,12 +74,12 @@ export interface BadgeProps {
   className?: string;
 }
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "ghost" | "outline";
-  size?: "sm" | "md" | "lg" | "icon";
-  loading?: boolean;
-  icon?: React.ReactNode;
-}
+// export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+//   variant?: "primary" | "secondary" | "danger" | "ghost" | "outline";
+//   size?: "sm" | "md" | "lg" | "icon";
+//   loading?: boolean;
+//   icon?: React.ReactNode;
+// }
 
 export interface CardProps {
   children: React.ReactNode;

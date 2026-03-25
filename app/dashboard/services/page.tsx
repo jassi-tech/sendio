@@ -8,10 +8,12 @@ import { Badge } from "@/components/ui/Badge";
 import { AddServiceModal } from "./AddServiceModal";
 import { EditServiceModal } from "./EditServiceModal";
 import { ConfigServiceModal } from "./ConfigServiceModal";
-import { smtpApi, ServiceDef } from "@/lib/api";
+import { ServiceDef, smtpApi } from "@/lib/api";
 import { useToast } from "@/context/ToastContext";
 import type { SmtpService } from "@/lib/interface";
 import Image from "next/image";
+import { useSMTPList, useDeleteSMTP, useUpdateSMTP } from "@/hooks/useSMTP";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function ServicesPage() {
   const { showToast, confirmToast } = useToast();
@@ -22,14 +24,12 @@ export default function ServicesPage() {
   const [configuringService, setConfiguringService] =
     useState<ServiceDef | null>(null);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [services, setServices] = useState<SmtpService[]>([]);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchServices();
-  }, []);
+  
+  const queryClient = useQueryClient();
+  const { data: rawServices = [], isLoading: loading } = useSMTPList();
+  const services = rawServices as SmtpService[];
+  const deleteMutation = useDeleteSMTP();
+  const updateMutation = useUpdateSMTP();
 
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
@@ -47,24 +47,6 @@ export default function ServicesPage() {
 
     return () => window.removeEventListener("click", handleGlobalClick);
   }, [openMenuId]);
-
-  const fetchServices = async () => {
-    try {
-      setLoading(true);
-      const data = await smtpApi.list();
-      if (Array.isArray(data) && data.length > 0) {
-        setServices(data);
-      } else {
-        setServices([]);
-      }
-    } catch (error) {
-      console.error("Failed to fetch services:", error);
-      showToast("Failed to fetch services", "error");
-      setServices([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getProviderLogo = (provider?: string) => {
     if (!provider || provider.toLowerCase() === "smtp") return ""; // Empty string forces onError to show SVG
@@ -99,9 +81,8 @@ export default function ServicesPage() {
 
   const handleSetDefault = async (serviceId: string) => {
     try {
-      await smtpApi.update(serviceId, { isDefault: true });
+      await updateMutation.mutateAsync({ id: serviceId, data: { isDefault: true } });
       showToast("Default service updated", "success");
-      fetchServices();
       setOpenMenuId(null);
     } catch (error: any) {
       showToast(error.message || "Failed to set default", "error");
@@ -221,9 +202,8 @@ export default function ServicesPage() {
                         if (!confirmed) return;
 
                         try {
-                          await smtpApi.delete(resolvedId);
+                          await deleteMutation.mutateAsync(resolvedId);
                           showToast("Service deleted", "success");
-                          fetchServices();
                         } catch (error: any) {
                           showToast(
                             error.message || "Failed to delete",
@@ -305,18 +285,12 @@ export default function ServicesPage() {
         isOpen={!!configuringService}
         onClose={() => setConfiguringService(null)}
         serviceDef={configuringService}
-        onCreated={() => {
-          fetchServices();
-        }}
       />
 
       <EditServiceModal
         isOpen={!!editingService}
         onClose={() => setEditingService(null)}
         service={editingService}
-        onUpdate={() => {
-          fetchServices();
-        }}
       />
     </div>
   );

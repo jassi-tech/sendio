@@ -14,7 +14,9 @@ import {
   AlertTriangle,
   X,
 } from "lucide-react";
-import { keysApi, smtpApi, templatesApi } from "@/lib/api";
+import { useKeys, useGenerateKey, useRevokeKey } from "@/hooks/useKeys";
+import { useSMTPList } from "@/hooks/useSMTP";
+import { useTemplates } from "@/hooks/useTemplates";
 import { useToast } from "@/context/ToastContext";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -25,42 +27,34 @@ import type { ApiKeyItem, ApiKeySmtpConfig, Template } from "@/lib/interface";
 
 export default function ApiKeysPage() {
   const { showToast } = useToast();
-  const [keys, setKeys] = useState<ApiKeyItem[]>([]);
-  const [senders, setSenders] = useState<ApiKeySmtpConfig[]>([]);
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rawKeys = [], isLoading: loadingKeys } = useKeys();
+  const { data: rawSenders = [], isLoading: loadingSenders } = useSMTPList();
+  const { data: templates = [], isLoading: loadingTemplates } = useTemplates();
+  const loading = loadingKeys || loadingSenders || loadingTemplates;
+
+  const keys = rawKeys as ApiKeyItem[];
+  const senders = rawSenders as ApiKeySmtpConfig[];
+
+  const generateMutation = useGenerateKey();
+  const revokeMutation = useRevokeKey();
+
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    label: "",
-    smtpConfigId: "",
-    templateId: "",
-  });
+  const [form, setForm] = useState({ label: "", smtpConfigId: "", templateId: "" });
   const [newRawKey, setNewRawKey] = useState("");
   const [copied, setCopied] = useState(false);
   const [revokingId, setRevokingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    Promise.all([keysApi.list(), smtpApi.list(), templatesApi.list()])
-      .then(([k, s, t]) => {
-        setKeys(k as ApiKeyItem[]);
-        setSenders(s as ApiKeySmtpConfig[]);
-        setTemplates(t as Template[]);
-      })
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = (await keysApi.generate({
+      const res = (await generateMutation.mutateAsync({
         label: form.label,
         smtpConfigId: form.smtpConfigId,
         templateId: form.templateId,
       })) as ApiKeyItem & { rawKey: string };
       setNewRawKey(res.rawKey);
-      setKeys((prev) => [res, ...prev]);
       setShowForm(false);
       setForm({ label: "", smtpConfigId: "", templateId: "" });
       showToast("API key generated", "success");
@@ -73,8 +67,7 @@ export default function ApiKeysPage() {
 
   const handleRevoke = async (id: string) => {
     try {
-      await keysApi.revoke(id);
-      setKeys((prev) => prev.filter((k) => k._id !== id));
+      await revokeMutation.mutateAsync(id);
       showToast("API key revoked", "success");
     } catch (err: any) {
       showToast(err.message || "Failed to revoke key", "error");
@@ -236,7 +229,7 @@ export default function ApiKeysPage() {
               <Button
                 type="submit"
                 variant="primary"
-                loading={saving}
+                loading={generateMutation.isPending}
                 icon={<Key size={16} />}
               >
                 Generate Key

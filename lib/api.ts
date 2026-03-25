@@ -127,5 +127,5 @@ export const servicesApi = {
 };
 
 // Send Mail (public API key call, for demo)
-export const sendMailApi = (apiKey: string, data: object) =>
-  requestWithApiKey('/send-mail', apiKey, { method: 'POST', body: JSON.stringify(data) });
+// export const sendMailApi = (apiKey: string, data: object) =>
+//   requestWithApiKey('/send-mail', apiKey, { method: 'POST', body: JSON.stringify(data) });

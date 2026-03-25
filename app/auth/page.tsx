@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Mail, Zap, Shield, Send, ArrowLeft } from 'lucide-react';
+import { useRequestMagicLink } from '@/hooks/useAuth';
 import { authApi } from '@/lib/api';
 import { useToast } from '@/context/ToastContext';
 import Link from 'next/link';
@@ -8,24 +9,21 @@ import Link from 'next/link';
 export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { showToast } = useToast();
+  const requestMutation = useRequestMagicLink();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
     try {
-      await authApi.requestMagicLink(email);
+      await requestMutation.mutateAsync(email);
       setSent(true);
       showToast('Sent successfully!', 'success');
-    } catch (err: unknown) {
-      const msg = (err as Error).message || 'Failed to send';
+    } catch (err: any) {
+      const msg = err.message || 'Failed to send';
       setError(msg);
       showToast(msg, 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -88,10 +86,10 @@ export default function AuthPage() {
                 )}
                 <button
                   type="submit"
-                  disabled={loading}
-                  className={`w-full py-s-13 px-s-20 rounded-s-8 text-white text-s-15 font-semibold flex items-center justify-center gap-s-8 transition-all shadow-accent-glow ${loading ? 'bg-bg-hover cursor-not-allowed shadow-none' : 'bg-gradient-to-r from-accent to-accent-dim hover:opacity-90'}`}
+                  disabled={requestMutation.isPending}
+                  className={`w-full py-s-13 px-s-20 rounded-s-8 text-white text-s-15 font-semibold flex items-center justify-center gap-s-8 transition-all shadow-accent-glow ${requestMutation.isPending ? 'bg-bg-hover cursor-not-allowed shadow-none' : 'bg-gradient-to-r from-accent to-accent-dim hover:opacity-90'}`}
                 >
-                  {loading ? (
+                  {requestMutation.isPending ? (
                     <div className="animate-spin w-s-18 h-s-18 border-2 border-white/30 border-t-white rounded-full" />
                   ) : (
                     <><Send className="w-s-16 h-s-16" /> Send Magic Link</>

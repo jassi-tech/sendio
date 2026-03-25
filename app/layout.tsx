@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 
 import { ToastProvider } from "@/context/ToastContext";
 import { Toaster } from "@/components/ui/Toaster";
+import QueryProvider from "@/providers/QueryProvider";
 
 export default function RootLayout({
   children,
@@ -32,14 +33,16 @@ export default function RootLayout({
         />
       </head>
       <body style={{ fontFamily: "Inter, sans-serif" }}>
-        <AuthProvider>
-          <ServiceProvider>
-            <ToastProvider>
-              <Toaster />
-              {children}
-            </ToastProvider>
-          </ServiceProvider>
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <ServiceProvider>
+              <ToastProvider>
+                <Toaster />
+                {children}
+              </ToastProvider>
+            </ServiceProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

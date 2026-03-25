@@ -29,7 +29,7 @@ export function Hero() {
             <div className="inline-flex items-center gap-s-8 px-s-1 py-s-8 bg-indigo-950/50 border border-indigo-500/30 rounded-full backdrop-blur-sm">
               <Sparkles className="w-s-16 h-s-16 text-indigo-400" />
               <span className="text-s-14 text-indigo-300 font-medium">
-                NOW IN BETA
+                NOW IN TESTING
               </span>
             </div>
           </motion.div>

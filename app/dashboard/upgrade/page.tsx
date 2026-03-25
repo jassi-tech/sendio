@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, ArrowLeft, X } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { plans, getPrice } from '@/lib/pricing';
@@ -10,6 +11,7 @@ import { PricingCard } from '@/components/pricing/PricingCard';
 
 export default function UpgradePage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [checkoutTab, setCheckoutTab] = useState<'details' | 'payment'>('details');
@@ -25,6 +27,12 @@ export default function UpgradePage() {
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<any>(null);
   const [showPromoInput, setShowPromoInput] = useState(false);
+
+  useEffect(() => {
+    if (user?.email && !formData.email) {
+      setFormData(prev => ({ ...prev, email: user.email }));
+    }
+  }, [user]);
 
   const isYearly = billingCycle === 'yearly';
   const basePrice = getPrice(selectedPlan?.price, isYearly) || 0;

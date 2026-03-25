@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, CheckCircle, Loader2, Server, Wifi, WifiOff, Star, ShieldCheck, Mail } from 'lucide-react';
-import { smtpApi } from '@/lib/api';
+import { useSMTPList, useSaveSMTP, useDeleteSMTP, useTestSMTP } from '@/hooks/useSMTP';
 import { useToast } from '@/context/ToastContext';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -12,29 +12,27 @@ import type { SmtpConfig } from '@/lib/interface';
 
 export default function SendersPage() {
   const { showToast } = useToast();
-  const [configs, setConfigs] = useState<SmtpConfig[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rawConfigs = [], isLoading: loading } = useSMTPList();
+  const configs = rawConfigs as SmtpConfig[];
+  
+  const saveMutation = useSaveSMTP();
+  const deleteMutation = useDeleteSMTP();
+  const testMutation = useTestSMTP();
+
   const [showForm, setShowForm] = useState(false);
-  const [testing, setTesting] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
   const [form, setForm] = useState({ label: '', host: '', port: '587', secure: false, user: '', password: '', fromName: '', fromEmail: '', isDefault: false });
 
-  useEffect(() => {
-    smtpApi.list().then((d) => setConfigs(d as SmtpConfig[])).finally(() => setLoading(false));
-  }, []);
-
   const handleTest = async () => {
-    setTesting(true); setTestResult(null);
+    setTestResult(null);
     try {
-      await smtpApi.test({ host: form.host, port: Number(form.port), secure: form.secure, user: form.user, password: form.password });
+      await testMutation.mutateAsync({ host: form.host, port: Number(form.port), secure: form.secure, user: form.user, password: form.password });
       setTestResult({ ok: true, msg: 'SMTP connection successful!' });
       showToast('SMTP Connection Successful', 'success');
     } catch (e: any) { 
       setTestResult({ ok: false, msg: e.message }); 
       showToast(e.message || 'Connection Failed', 'error');
     }
-    finally { setTesting(false); }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -47,30 +45,25 @@ export default function SendersPage() {
     }
 
     try {
-      setSaving(true);
-      const newCfg = await smtpApi.save({ 
+      await saveMutation.mutateAsync({ 
         ...form, 
         port: Number(form.port),
         provider: 'smtp' // Required by backend validation
       });
       showToast('Sender profile created', 'success');
-      setConfigs((prev) => [newCfg as SmtpConfig, ...prev]);
       setShowForm(false); 
       setForm({ label: '', host: '', port: '587', secure: false, user: '', password: '', fromName: '', fromEmail: '', isDefault: false });
       setTestResult(null);
     } catch (e: any) { 
       showToast(e.message || 'Failed to save configuration', 'error'); 
-    } finally { 
-      setSaving(false); 
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this sender profile?')) return;
     try {
-      await smtpApi.delete(id);
+      await deleteMutation.mutateAsync(id);
       showToast('Sender profile deleted', 'success');
-      setConfigs((prev) => prev.filter((c) => c._id !== id));
     } catch (e: any) {
       showToast(e.message || 'Failed to delete', 'error');
     }
@@ -144,8 +137,8 @@ export default function SendersPage() {
 
             <div className="flex items-center justify-end gap-s-12 pt-s-16 border-t border-border">
               <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
-              <Button type="button" variant="secondary" onClick={handleTest} loading={testing} icon={<Wifi size={16} />}>Test Connection</Button>
-              <Button type="submit" variant="primary" loading={saving} icon={<CheckCircle size={16} />}>Create Profile</Button>
+              <Button type="button" variant="secondary" onClick={handleTest} loading={testMutation.isPending} icon={<Wifi size={16} />}>Test Connection</Button>
+              <Button type="submit" variant="primary" loading={saveMutation.isPending} icon={<CheckCircle size={16} />}>Create Profile</Button>
             </div>
           </form>
         </Card>

@@ -4,7 +4,9 @@ import React, { useEffect, useState } from "react";
 import { X, HelpCircle, Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { servicesApi, ServiceDef, smtpApi } from "@/lib/api";
+import { ServiceDef, smtpApi } from "@/lib/api";
+import { useServices } from "@/hooks/useServices";
+import { useUpdateSMTP } from "@/hooks/useSMTP";
 import type { EditServiceModalProps } from "@/lib/interface";
 import { handleGoogleSignIn } from "@/helper";
 import { useToast } from "@/context/ToastContext";
@@ -16,10 +18,11 @@ export function EditServiceModal({
   onUpdate,
 }: EditServiceModalProps) {
   const { showToast } = useToast();
-  const [providerDef, setProviderDef] = useState<ServiceDef | null>(null);
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [updating, setUpdating] = useState(false);
+  const { data: services = [], isLoading: loading } = useServices();
+  const updateMutation = useUpdateSMTP();
+  const providerDef = services.find((s) => s.id === service?.provider);
+  
   const [connectedEmail, setConnectedEmail] = useState<string | null>(null);
   const [disconnecting, setDisconnecting] = useState(false);
   const [testEmail, setTestEmail] = useState(true);
@@ -28,22 +31,8 @@ export function EditServiceModal({
     if (isOpen && service) {
       setName(service.label || "");
       setConnectedEmail(service.user || null);
-      fetchProviderDef(service.provider);
     }
   }, [isOpen, service]);
-
-  const fetchProviderDef = async (providerId: string) => {
-    try {
-      setLoading(true);
-      const allServices = await servicesApi.list();
-      const def = allServices.find((s) => s.id === providerId);
-      if (def) setProviderDef(def);
-    } catch (error) {
-      console.error("Failed to load provider definition:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (!isOpen || !service) return null;
 
@@ -56,7 +45,7 @@ export function EditServiceModal({
     }
     try {
       setDisconnecting(true);
-      await smtpApi.update(serviceMongoId, { user: "", fromEmail: "" });
+      await updateMutation.mutateAsync({ id: serviceMongoId, data: { user: "", fromEmail: "" } });
       setConnectedEmail(null);
       showToast("Service disconnected", "success");
     } catch (error: any) {
@@ -69,16 +58,13 @@ export function EditServiceModal({
   const handleUpdate = async () => {
     if (!service._id) return;
     try {
-      setUpdating(true);
-      await smtpApi.update(service._id, { label: name });
+      await updateMutation.mutateAsync({ id: service._id, data: { label: name } });
       showToast("Service updated successfully", "success");
 
       if (onUpdate) onUpdate();
       onClose();
     } catch (error: any) {
       showToast(error.message || "Failed to update service", "error");
-    } finally {
-      setUpdating(false);
     }
   };
 
@@ -283,7 +269,7 @@ export function EditServiceModal({
           <Button
             variant="primary"
             onClick={handleUpdate}
-            loading={updating}
+            loading={updateMutation.isPending}
             icon={<Check size={18} />}
           >
             Update Service

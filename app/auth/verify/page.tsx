@@ -2,13 +2,14 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, XCircle, Mail } from 'lucide-react';
-import { authApi } from '@/lib/api';
+import { useVerify } from '@/hooks/useAuth';
 import { useAuth } from '@/context/AuthContext';
 
 function VerifyContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
   const { login } = useAuth();
+  const verifyMutation = useVerify();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -20,15 +21,15 @@ function VerifyContent() {
       return;
     }
 
-    authApi.verify(token)
+    verifyMutation.mutateAsync(token)
       .then(async ({ token: jwt }) => {
         await login(jwt);
         setStatus('success');
         setTimeout(() => router.replace('/dashboard'), 1500);
       })
-      .catch((err: unknown) => {
+      .catch((err: any) => {
         setStatus('error');
-        setMessage((err as Error).message || 'Token invalid or expired');
+        setMessage(err.message || 'Token invalid or expired');
       });
   }, [searchParams, router]);
 

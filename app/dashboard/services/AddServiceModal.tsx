@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { X, HelpCircle, Loader2 } from "lucide-react";
-import { ServiceDef, servicesApi } from "@/lib/api";
+import { ServiceDef } from "@/lib/api";
+import { useServices } from "@/hooks/useServices";
 import { Button } from "@/components/ui/Button";
 import type { AddServiceModalProps } from "@/lib/interface";
 import Image from "next/image";
@@ -12,27 +13,7 @@ export function AddServiceModal({
   onClose,
   onSelect,
 }: AddServiceModalProps) {
-  const [services, setServices] = useState<ServiceDef[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchServices();
-    }
-  }, [isOpen]);
-
-  const fetchServices = async () => {
-    try {
-      setLoading(true);
-      const data = await servicesApi.list();
-      setServices(data || []);
-    } catch (error) {
-      console.error("Failed to load services for modal:", error);
-      setServices([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: services = [], isLoading: loading } = useServices();
 
   if (!isOpen) return null;
 

@@ -1,7 +1,7 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import { ScrollText, Loader2, ChevronLeft, ChevronRight, X, RefreshCw, Mail, User, Clock, AlertCircle, Terminal, Key, ArrowRight } from 'lucide-react';
-import { logsApi } from '@/lib/api';
+import { useLogs } from '@/hooks/useLogs';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -20,24 +20,20 @@ const getStatusVariant = (s: Status): 'success' | 'error' | 'warning' | 'info' =
 };
 
 export default function LogsPage() {
-  const [logs, setLogs] = useState<LogItem[]>([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [selected, setSelected] = useState<LogItem | null>(null);
   const limit = 15;
 
-  const fetchLogs = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await logsApi.list({ page, limit, status: statusFilter || undefined });
-      setLogs(res.data || []);
-      setTotal(res.pagination?.total || 0);
-    } finally { setLoading(false); }
-  }, [page, statusFilter]);
+  const { data, isLoading, isFetching, refetch } = useLogs({ 
+    page, 
+    limit, 
+    status: statusFilter || undefined 
+  });
 
-  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+  const logs = data?.data || [];
+  const total = data?.pagination?.total || 0;
+  const loading = isLoading || isFetching;
 
   const pages = Math.ceil(total / limit);
 
@@ -60,7 +56,7 @@ export default function LogsPage() {
             <option value="queued">Queued</option>
             <option value="sending">In Flight</option>
           </select>
-          <Button variant="secondary" onClick={fetchLogs} icon={<RefreshCw size={14} />}>Refresh</Button>
+          <Button variant="secondary" onClick={() => refetch()} icon={<RefreshCw size={14} />}>Refresh</Button>
         </div>
       </div>
 
@@ -95,7 +91,7 @@ export default function LogsPage() {
                 </TR>
               </THead>
               <TBody>
-                {logs.map((log) => (
+                {logs.map((log: LogItem) => (
                   <TR key={log._id} onClick={() => setSelected(log)}>
                     <TD>
                       <div className="flex items-center gap-s-12">

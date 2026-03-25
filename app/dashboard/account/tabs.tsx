@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { authApi } from '@/lib/api';
+import { useRefreshKeys, useDeleteAccount } from '@/hooks/useAuth';
 import { useToast } from '@/context/ToastContext';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -12,43 +12,41 @@ import { plans } from '@/lib/pricing';
 
 export function GeneralTab() {
   const { showToast } = useToast();
-  const { user, fetchUser, logout } = useAuth();
-  const [refreshing, setRefreshing] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [showPrivateKey, setShowPrivateKey] = useState(false);
+  const { user, logout } = useAuth();
+  // const { user, fetchUser, logout } = useAuth();
+  
+  // const refreshMutation = useRefreshKeys();
+  const deleteMutation = useDeleteAccount();
+
+  // const [showPrivateKey, setShowPrivateKey] = useState(false);
   const router = useRouter();
 
   if (!user) return null;
 
-  const handleRefreshKeys = async () => {
-    try {
-      setRefreshing(true);
-      await authApi.refreshKeys();
-      await fetchUser();
-      showToast('API keys refreshed', 'success');
-    } catch (err: any) {
-      showToast(err.message || 'Failed to refresh keys', 'error');
-    } finally {
-      setRefreshing(false);
-    }
-  };
+  // const handleRefreshKeys = async () => {
+  //   try {
+  //     await refreshMutation.mutateAsync();
+  //     await fetchUser();
+  //     showToast('API keys refreshed', 'success');
+  //   } catch (err: any) {
+  //     showToast(err.message || 'Failed to refresh keys', 'error');
+  //   }
+  // };
 
   const handleDeleteAccount = async () => {
     if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
     try {
-      setDeleting(true);
-      await authApi.deleteAccount();
+      await deleteMutation.mutateAsync();
       showToast('Account deleted successfully', 'success');
       logout();
     } catch (err: any) {
       showToast(err.message || 'Failed to delete account', 'error');
-      setDeleting(false);
     }
   };
 
   return (
     <div className="space-y-s-32">
-      {/* API Keys */}
+      {/* API Keys
       <Card variant="solid">
         <h3 className="text-s-16 font-bold mb-s-24 tracking-tight">API keys</h3>
         
@@ -82,14 +80,15 @@ export function GeneralTab() {
           <Button 
             variant="secondary" 
             size="sm" 
-            icon={<RefreshCw className={`w-s-14 h-s-14 ${refreshing ? 'animate-spin' : ''}`} />}
+            icon={<RefreshCw className={`w-s-14 h-s-14 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />}
             onClick={handleRefreshKeys}
-            loading={refreshing}
+            loading={refreshMutation.isPending}
           >
             Refresh Keys
           </Button>
         </div>
       </Card>
+      */}
 
       {/* Notifications */}
       <Card variant="solid">
@@ -130,7 +129,7 @@ export function GeneralTab() {
           size="sm" 
           icon={<Trash2 className="w-s-14 h-s-14" />}
           onClick={handleDeleteAccount}
-          loading={deleting}
+          loading={deleteMutation.isPending}
         >
           Delete My Account
         </Button>

@@ -1,8 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Send, CheckCircle, XCircle, Clock, Server, Key, ArrowRight, Activity } from 'lucide-react';
-import { logsApi, smtpApi, keysApi } from '@/lib/api';
+import { useLogs } from '@/hooks/useLogs';
+import { useSMTPList } from '@/hooks/useSMTP';
+import { useKeys } from '@/hooks/useKeys';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -10,26 +11,22 @@ import type { Stat } from '@/lib/interface';
 
 export default function OverviewPage() {
   const router = useRouter();
-  const [stats, setStats] = useState({ sent: 0, failed: 0, queued: 0, senders: 0, keys: 0 });
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    Promise.allSettled([
-      logsApi.list({ limit: 1, status: 'sent' }),
-      logsApi.list({ limit: 1, status: 'failed' }),
-      logsApi.list({ limit: 1, status: 'queued' }),
-      smtpApi.list() as Promise<unknown[]>,
-      keysApi.list() as Promise<unknown[]>,
-    ]).then(([s, f, q, sn, k]) => {
-      setStats({
-        sent:    s.status === 'fulfilled' ? (s.value as any).pagination?.total ?? 0 : 0,
-        failed:  f.status === 'fulfilled' ? (f.value as any).pagination?.total ?? 0 : 0,
-        queued:  q.status === 'fulfilled' ? (q.value as any).pagination?.total ?? 0 : 0,
-        senders: sn.status === 'fulfilled' ? (sn.value as unknown[]).length : 0,
-        keys:    k.status === 'fulfilled'  ? (k.value as unknown[]).length : 0,
-      });
-    }).finally(() => setLoading(false));
-  }, []);
+  const { data: sentLogs, isLoading: loadingSent } = useLogs({ limit: 1, status: 'sent' });
+  const { data: failedLogs, isLoading: loadingFailed } = useLogs({ limit: 1, status: 'failed' });
+  const { data: queuedLogs, isLoading: loadingQueued } = useLogs({ limit: 1, status: 'queued' });
+  const { data: senders, isLoading: loadingSenders } = useSMTPList();
+  const { data: keys, isLoading: loadingKeys } = useKeys();
+
+  const loading = loadingSent || loadingFailed || loadingQueued || loadingSenders || loadingKeys;
+
+  const stats = {
+    sent: sentLogs?.pagination?.total ?? 0,
+    failed: failedLogs?.pagination?.total ?? 0,
+    queued: queuedLogs?.pagination?.total ?? 0,
+    senders: (senders as any[])?.length ?? 0,
+    keys: (keys as any[])?.length ?? 0,
+  };
 
   const statsConfig: Stat[] = [
     { label: 'Emails Sent',   value: stats.sent,    icon: CheckCircle, variant: 'success' },

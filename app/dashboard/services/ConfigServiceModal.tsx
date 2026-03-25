@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { X, HelpCircle, Check, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { servicesApi, ServiceDef, smtpApi } from "@/lib/api";
+import { ServiceDef } from "@/lib/api";
+import { useSaveSMTP } from "@/hooks/useSMTP";
 import type { ConfigServiceModalProps } from "@/lib/interface";
 import Image from "next/image";
 import { useServiceContext } from "@/context/ServiceContext";
@@ -20,7 +21,7 @@ export function ConfigServiceModal({
   const { showToast } = useToast();
   const [name, setName] = useState("");
   const [serviceId, setServiceId] = useState("");
-  const [creating, setCreating] = useState(false);
+  const saveMutation = useSaveSMTP();
   const [testEmail, setTestEmail] = useState(true);
   const [showGoogleSignIn, setShowGoogleSignIn] = useState(false);
   const [connectedEmail, setConnectedEmail] = useState<string | null>(null);
@@ -60,8 +61,6 @@ export function ConfigServiceModal({
     }
 
     try {
-      setCreating(true);
-
       const payload = {
         serviceId,
         label: name,
@@ -77,15 +76,13 @@ export function ConfigServiceModal({
         fromEmail: fromEmail || connectedEmail || "",
       };
 
-      await smtpApi.save(payload);
+      await saveMutation.mutateAsync(payload);
       showToast("Service created successfully", "success");
 
       if (onCreated) onCreated();
       onClose();
     } catch (error: any) {
       showToast(error.message || "Failed to create service", "error");
-    } finally {
-      setCreating(false);
     }
   };
 
@@ -316,7 +313,7 @@ export function ConfigServiceModal({
           <Button
             variant="primary"
             onClick={handleCreate}
-            loading={creating}
+            loading={saveMutation.isPending}
             icon={<Check size={18} />}
           >
             Create Service
