@@ -9,7 +9,7 @@ import { useSaveSMTP } from "@/hooks/useSMTP";
 import type { ConfigServiceModalProps } from "@/lib/interface";
 import Image from "next/image";
 import { useServiceContext } from "@/context/ServiceContext";
-import { handleGoogleSignIn } from "@/helper";
+import { handleGoogleSignIn, handleMicrosoftSignIn } from "@/helper";
 import { useToast } from "@/context/ToastContext";
 
 export function ConfigServiceModal({
@@ -23,10 +23,10 @@ export function ConfigServiceModal({
   const [serviceId, setServiceId] = useState("");
   const saveMutation = useSaveSMTP();
   const [testEmail, setTestEmail] = useState(true);
-  const [showGoogleSignIn, setShowGoogleSignIn] = useState(false);
   const [connectedEmail, setConnectedEmail] = useState<string | null>(null);
   const [fromName, setFromName] = useState("");
   const [fromEmail, setFromEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const { setActiveServiceId } = useServiceContext();
 
@@ -36,6 +36,10 @@ export function ConfigServiceModal({
       const newId = `${serviceDef.id}_${Math.random().toString(36).substring(2, 7)}`;
       setServiceId(newId);
       setActiveServiceId(newId);
+      
+      // Reset sensitive fields
+      setConnectedEmail(null);
+      setPassword("");
     }
   }, [isOpen, serviceDef]);
 
@@ -46,18 +50,28 @@ export function ConfigServiceModal({
 
   if (!isOpen || !serviceDef) return null;
 
+  const isOauth = serviceDef.id === "gmail" || serviceDef.id === "outlook";
+
   const handleCreate = async () => {
     if (!name.trim()) {
       showToast("Name is required", "error");
       return;
     }
-    if (!connectedEmail) {
-      showToast("Please connect your Google account", "error");
-      return;
-    }
-    if (!fromEmail.trim()) {
-      showToast("From email is required", "error");
-      return;
+    
+    if (isOauth) {
+      if (!connectedEmail) {
+        showToast(`Please connect your ${serviceDef.name} account`, "error");
+        return;
+      }
+    } else {
+      if (!fromEmail.trim()) {
+        showToast("Email is required", "error");
+        return;
+      }
+      if (!password.trim()) {
+        showToast("Password/App Password is required", "error");
+        return;
+      }
     }
 
     try {
@@ -68,11 +82,11 @@ export function ConfigServiceModal({
         host: serviceDef.smtpHost || "",
         port: serviceDef.smtpPort || 587,
         secure: serviceDef.smtpSecure ?? true,
-        user: connectedEmail || "",
-        password: " ", // Simulated password for connection (OAuth token could be used here)
+        user: isOauth ? (connectedEmail || "") : fromEmail,
+        password: isOauth ? " " : password,
         isDefault: false,
         sendTest: testEmail,
-        fromName: fromName || name, // Fallback to service name if not provided
+        fromName: fromName || name,
         fromEmail: fromEmail || connectedEmail || "",
       };
 
@@ -98,7 +112,18 @@ export function ConfigServiceModal({
   const limitText =
     serviceDef.id === "gmail"
       ? "500 emails per day"
+      : serviceDef.id === "outlook"
+      ? "10,000 emails per day"
       : "Limit depends on provider";
+
+  const handleConnect = () => {
+    const callbacks = { setConnectedEmail, setFromEmail, setFromName };
+    if (serviceDef.id === "gmail") {
+      handleGoogleSignIn(callbacks);
+    } else if (serviceDef.id === "outlook") {
+      handleMicrosoftSignIn(callbacks);
+    }
+  };
 
   const regenerateServiceId = () => {
     const newId = `${serviceDef.id}_${Math.random().toString(36).substring(2, 7)}`;
@@ -186,28 +211,37 @@ export function ConfigServiceModal({
               placeholder={`e.g. My ${serviceDef.name}`}
             />
 
-            {/* From Details (Only shows if connected) */}
-            {connectedEmail && (
+            {/* From Details (Only shows if connected or not OAuth) */}
+            {(connectedEmail || !isOauth) && (
               <div className="flex gap-s-16">
                 <div className="flex-1">
                   <Input
                     label="From Name"
                     value={fromName}
-                    readOnly
                     onChange={(e) => setFromName(e.target.value)}
                     placeholder="e.g. Acme Support"
                   />
                 </div>
                 <div className="flex-1">
                   <Input
-                    label="From Email"
+                    label="From Email *"
                     value={fromEmail}
-                    readOnly
+                    readOnly={isOauth}
                     onChange={(e) => setFromEmail(e.target.value)}
                     placeholder="e.g. support@acme.com"
                   />
                 </div>
               </div>
+            )}
+
+            {!isOauth && (
+              <Input
+                label="App Password *"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your 16-character app password"
+              />
             )}
 
             {/* Service ID Input (Readonly for preview/mock) */}
@@ -234,40 +268,42 @@ export function ConfigServiceModal({
             </div>
 
             {/* Connect Button or Status */}
-            <div className="flex flex-col gap-s-8">
-              <label className="block text-s-12 font-semibold text-text-secondary ml-s-2">
-                {serviceDef.name} Connect
-              </label>
+            {isOauth && (
+              <div className="flex flex-col gap-s-8">
+                <label className="block text-s-12 font-semibold text-text-secondary ml-s-2">
+                  {serviceDef.name} Connect
+                </label>
 
-              {connectedEmail ? (
-                <div className="flex items-center justify-between p-s-16 border border-border rounded-s-12 bg-bg-card">
-                  <span className="text-s-14 text-text-primary">
-                    Connected as{" "}
-                    <span className="font-semibold text-accent">
-                      {connectedEmail}
+                {connectedEmail ? (
+                  <div className="flex items-center justify-between p-s-16 border border-border rounded-s-12 bg-bg-card">
+                    <span className="text-s-14 text-text-primary">
+                      Connected as{" "}
+                      <span className="font-semibold text-accent">
+                        {connectedEmail}
+                      </span>
                     </span>
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-auto py-s-6"
-                    onClick={() => setConnectedEmail(null)}
-                  >
-                    Disconnect
-                  </Button>
-                </div>
-              ) : (
-                <div>
-                  <Button
-                    variant="primary"
-                    className="h-auto py-s-10 px-s-24 text-s-14"
-                    onClick={() => handleGoogleSignIn({ setConnectedEmail, setFromEmail, setFromName })}
-                  >
-                    Sign in with Google
-                  </Button>
-                </div>
-              )}
-            </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-auto py-s-6"
+                      onClick={() => setConnectedEmail(null)}
+                    >
+                      Disconnect
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <Button
+                      variant="primary"
+                      className="h-auto py-s-10 px-s-24 text-s-14"
+                      onClick={handleConnect}
+                    >
+                      Sign in with {serviceDef.name}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Info Message */}
             <div className="flex gap-s-12 p-s-16 bg-bg-elevated/40 border border-border rounded-s-12">
@@ -275,11 +311,19 @@ export function ConfigServiceModal({
                 <HelpCircle size={16} />
               </div>
               <p className="text-sm text-text-secondary leading-relaxed">
-                Please allow the &quot;Send email on your behalf&quot;
-                permission when connecting.
-                <br />
-                Both {serviceDef.name} and Google Workspace accounts are
-                supported.
+                {isOauth ? (
+                  <>
+                    Please allow the &quot;Send email on your behalf&quot; permission when connecting.
+                    <br />
+                    Both {serviceDef.name} and Enterprise accounts are supported.
+                  </>
+                ) : (
+                  <>
+                    For security, {serviceDef.name} requires an <b>App Password</b> instead of your normal account password.
+                    <br />
+                    Go to your {serviceDef.name} account security settings to generate one.
+                  </>
+                )}
               </p>
             </div>
 
@@ -307,7 +351,7 @@ export function ConfigServiceModal({
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-s-12 p-s-16 border-t border-border bg-bg-card">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={handleClose}>
             Cancel
           </Button>
           <Button
