@@ -40,7 +40,7 @@ function VerifyContent() {
           <>
             <div className="w-s-56 h-s-56 border-s-3 border-border border-t-accent rounded-full animate-spin mx-auto mb-s-20" />
             <p className="text-text-secondary text-s-15">
-              Verifying your magic link…
+              Verifying your link…
             </p>
           </>
         )}

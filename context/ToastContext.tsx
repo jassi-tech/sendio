@@ -41,7 +41,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   // Confirm toast (Promise-based)
   const confirmToast = useCallback((message: string): Promise<boolean> => {
     return new Promise((resolve) => {
-      console.log("confirmState being set:", message);
       setConfirmState({ message, resolve });
     });
   }, []);

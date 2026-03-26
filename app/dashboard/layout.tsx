@@ -22,10 +22,10 @@ import { ChatWidget } from "@/components/chatbot/ChatWidget";
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
   { href: "/dashboard/services", icon: Server, label: "Services" },
-  { href: "/dashboard/senders", icon: Server, label: "Senders" },
   { href: "/dashboard/templates", icon: FileCode2, label: "Templates" },
   { href: "/dashboard/logs", icon: ScrollText, label: "Logs" },
-  { href: "/dashboard/account", icon: Key, label: "Account" }, // Reusing Key icon for now as in reference image or User icon if available
+  { href: "/dashboard/senders", icon: Server, label: "Senders" },
+  { href: "/dashboard/account", icon: Key, label: "Account" },
 ];
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {

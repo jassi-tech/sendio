@@ -64,7 +64,7 @@ export default function AuthPage() {
                 Sign in to MailFlow
               </h1>
               <p className="text-s-14 text-text-secondary mb-s-28">
-                Enter your email and we&apos;ll send you a magic link.
+                Enter your email and we&apos;ll send you a link.
               </p>
 
               <form onSubmit={handleSubmit}>
@@ -79,11 +79,6 @@ export default function AuthPage() {
                   required
                   className={`w-full p-s-12 px-s-16 bg-bg-elevated border border-border rounded-s-8 text-text-primary text-s-15 outline-none transition-all focus:border-accent ${error ? 'mb-s-8' : 'mb-s-20'}`}
                 />
-                {error && (
-                  <p className="text-s-13 text-error mb-s-16">
-                    {error}
-                  </p>
-                )}
                 <button
                   type="submit"
                   disabled={requestMutation.isPending}
@@ -106,7 +101,7 @@ export default function AuthPage() {
                 Check your inbox!
               </h2>
               <p className="text-s-14 text-text-secondary leading-s-24">
-                We sent a magic link to <strong className="text-text-primary">{email}</strong>.<br />
+                We sent a link to <strong className="text-text-primary">{email}</strong>.<br />
                 The link expires in 15 minutes.
               </p>
               <button

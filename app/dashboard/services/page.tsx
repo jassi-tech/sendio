@@ -193,12 +193,9 @@ export default function ServicesPage() {
                       size="icon"
                       variant="ghost"
                       onClick={async () => {
-                        console.log("resolvedId:", resolvedId); // ← add this
-                        console.log("service:", service); // ← and this
                         const confirmed = await confirmToast(
                           "This action cannot be undone.",
                         );
-                        console.log('confirmed:', confirmed);
                         if (!confirmed) return;
 
                         try {
@@ -219,7 +216,7 @@ export default function ServicesPage() {
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={(e) => {
+                        onClick={(e:any) => {
                           e.stopPropagation();
                           setOpenMenuId(
                             openMenuId === resolvedId ? null : resolvedId,
@@ -255,7 +252,6 @@ export default function ServicesPage() {
                             onClick={(e) => {
                               e.stopPropagation();
                               setOpenMenuId(null);
-                              console.log("Testing service:", resolvedId);
                             }}
                             className="w-full text-left px-s-16 py-s-10 text-s-13 text-text-primary hover:bg-bg-hover transition-colors font-medium cursor-pointer"
                           >
