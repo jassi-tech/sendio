@@ -117,7 +117,12 @@ export function ConfigServiceModal({
       : "Limit depends on provider";
 
   const handleConnect = () => {
-    const callbacks = { setConnectedEmail, setFromEmail, setFromName };
+    const callbacks = {
+      setConnectedEmail,
+      setFromEmail,
+      setFromName,
+      onError: (err: string) => showToast(err, "error"),
+    };
     if (serviceDef.id === "gmail") {
       handleGoogleSignIn(callbacks);
     } else if (serviceDef.id === "outlook") {

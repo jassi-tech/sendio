@@ -23,6 +23,7 @@ export interface GoogleAuthCallbacks {
   setConnectedEmail: (email: string) => void;
   setFromEmail?: (email: string) => void;
   setFromName?: (name: string) => void;
+  onError?: (error: string) => void;
 }
 
 // ──────────────────────────────────────────────

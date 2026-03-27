@@ -5,6 +5,7 @@ export const handleGoogleSignIn = ({
   setConnectedEmail,
   setFromEmail,
   setFromName,
+  onError,
 }: GoogleAuthCallbacks): void => {
   const width = 500;
   const height = 600;
@@ -28,6 +29,10 @@ export const handleGoogleSignIn = ({
         setFromName?.(user.name);
       }
       window.removeEventListener("message", messageListener);
+    } else if (event.data?.type === "GOOGLE_AUTH_ERROR") {
+      const { error } = event.data;
+      onError?.(error || "Google authentication failed");
+      window.removeEventListener("message", messageListener);
     }
   };
 
@@ -38,6 +43,7 @@ export const handleMicrosoftSignIn = ({
   setConnectedEmail,
   setFromEmail,
   setFromName,
+  onError,
 }: GoogleAuthCallbacks): void => {
   const width = 500;
   const height = 600;
@@ -60,6 +66,10 @@ export const handleMicrosoftSignIn = ({
       if (user.name) {
         setFromName?.(user.name);
       }
+      window.removeEventListener("message", messageListener);
+    } else if (event.data?.type === "MICROSOFT_AUTH_ERROR") {
+      const { error } = event.data;
+      onError?.(error || "Microsoft authentication failed");
       window.removeEventListener("message", messageListener);
     }
   };
