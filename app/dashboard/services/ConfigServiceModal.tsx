@@ -81,7 +81,7 @@ export function ConfigServiceModal({
         provider: serviceDef.id,
         host: serviceDef.smtpHost || "",
         port: serviceDef.smtpPort || 587,
-        secure: serviceDef.smtpSecure ?? true,
+        secure: serviceDef.smtpSecure ?? (serviceDef.smtpPort === 465),
         user: isOauth ? (connectedEmail || "") : fromEmail,
         password: isOauth ? " " : password,
         isDefault: false,
