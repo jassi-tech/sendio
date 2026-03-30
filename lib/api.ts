@@ -65,9 +65,9 @@ export const authApi = {
     request('/auth/magic-link', { method: 'POST', body: JSON.stringify({ email }) }),
   verify: (token: string) =>
     request<{ token: string; user: { id: string; email: string; name?: string } }>(`/auth/verify?token=${token}`),
-  me: () => request<{ id: string; email: string; name?: string; publicKey: string; privateKey: string }>('/auth/me'),
+  me: () => request<{ id: string; email: string; name?: string; /* publicKey: string; privateKey: string */ }>('/auth/me'),
   deleteAccount: () => request('/auth/me', { method: 'DELETE' }),
-  refreshKeys: () => request<{ publicKey: string; privateKey: string }>('/auth/keys/refresh', { method: 'POST' }),
+  // refreshKeys: () => request<{ publicKey: string; privateKey: string }>('/auth/keys/refresh', { method: 'POST' }),
 };
 
 // SMTP

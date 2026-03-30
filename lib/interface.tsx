@@ -7,8 +7,8 @@ export interface User {
   id: string;
   email: string;
   name?: string;
-  publicKey?: string;
-  privateKey?: string;
+  // publicKey?: string;
+  // privateKey?: string;
 }
 
 export interface AuthCtx {
