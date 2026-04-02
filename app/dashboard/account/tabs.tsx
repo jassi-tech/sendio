@@ -1,112 +1,77 @@
-'use client';
-import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useRefreshKeys, useDeleteAccount } from '@/hooks/useAuth';
-import { useToast } from '@/context/ToastContext';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { RefreshCw, Trash2, CheckCircle, EyeOff, Eye, Check, X, Zap } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { plans } from '@/lib/pricing';
+"use client";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useDeleteAccount } from "@/hooks/useAuth";
+import { useToast } from "@/context/ToastContext";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import {
+  Trash2,
+  CheckCircle,
+  EyeOff,
+  Eye,
+  Check,
+  X,
+  Zap,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { plans } from "@/lib/pricing";
 
 export function GeneralTab() {
   const { showToast } = useToast();
   const { user, logout } = useAuth();
   // const { user, fetchUser, logout } = useAuth();
-  
-  // const refreshMutation = useRefreshKeys();
+
   const deleteMutation = useDeleteAccount();
 
-  // const [showPrivateKey, setShowPrivateKey] = useState(false);
   const router = useRouter();
 
   if (!user) return null;
 
-  // const handleRefreshKeys = async () => {
-  //   try {
-  //     await refreshMutation.mutateAsync();
-  //     await fetchUser();
-  //     showToast('API keys refreshed', 'success');
-  //   } catch (err: any) {
-  //     showToast(err.message || 'Failed to refresh keys', 'error');
-  //   }
-  // };
-
   const handleDeleteAccount = async () => {
-    if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) return;
+    if (
+      !confirm(
+        "Are you sure you want to delete your account? This action cannot be undone.",
+      )
+    )
+      return;
     try {
       await deleteMutation.mutateAsync();
-      showToast('Account deleted successfully', 'success');
+      showToast("Account deleted successfully", "success");
       logout();
     } catch (err: any) {
-      showToast(err.message || 'Failed to delete account', 'error');
+      showToast(err.message || "Failed to delete account", "error");
     }
   };
 
   return (
     <div className="space-y-s-32">
-      {/* API Keys
-      <Card variant="solid">
-        <h3 className="text-s-16 font-bold mb-s-24 tracking-tight">API keys</h3>
-        
-        <div className="space-y-s-20">
-          <div>
-            <label className="block text-s-12 text-text-secondary mb-s-8 font-medium">Public Key</label>
-            <Input 
-              value={user.publicKey || 'mf_pub_***************'} 
-              readOnly 
-              className="font-mono text-s-13 bg-bg-base/50 text-text-muted select-all"
-            />
-          </div>
-          <div>
-            <label className="block text-s-12 text-text-secondary mb-s-8 font-medium">Private Key</label>
-            <div className="relative">
-              <Input 
-                value={user.privateKey || 'mf_priv_******************************'} 
-                type={showPrivateKey ? 'text' : 'password'}
-                readOnly 
-                className="font-mono text-s-13 bg-bg-base/50 text-text-muted pr-s-40 select-all"
-              />
-              <button 
-                className="absolute right-s-12 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
-                onClick={() => setShowPrivateKey(!showPrivateKey)}
-                type="button"
-              >
-                {showPrivateKey ? <EyeOff className="w-s-16 h-s-16" /> : <Eye className="w-s-16 h-s-16" />}
-              </button>
-            </div>
-          </div>
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            icon={<RefreshCw className={`w-s-14 h-s-14 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />}
-            onClick={handleRefreshKeys}
-            loading={refreshMutation.isPending}
-          >
-            Refresh Keys
-          </Button>
-        </div>
-      </Card>
-      */}
-
       {/* Notifications */}
       <Card variant="solid">
-        <h3 className="text-s-16 font-bold mb-s-16 tracking-tight">Notifications</h3>
+        <h3 className="text-s-16 font-bold mb-s-16 tracking-tight">
+          Notifications
+        </h3>
         <p className="text-s-13 text-text-secondary mb-s-24">
           All system notifications will be sent to the email address below
         </p>
-        
+
         <div className="space-y-s-20 max-w-s-500">
           <div>
-            <label className="block text-s-12 text-text-secondary mb-s-8 font-medium">Email <span className="text-error">*</span></label>
-            <Input 
-              value={user.email} 
-              readOnly 
+            <label className="block text-s-12 text-text-secondary mb-s-8 font-medium">
+              Email <span className="text-error">*</span>
+            </label>
+            <Input
+              value={user.email}
+              readOnly
               className="bg-bg-base/50 text-text-muted"
             />
           </div>
-          <Button variant="secondary" size="sm" icon={<CheckCircle className="w-s-14 h-s-14" />}>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<CheckCircle className="w-s-14 h-s-14" />}
+          >
             Change
           </Button>
         </div>
@@ -114,19 +79,33 @@ export function GeneralTab() {
 
       {/* Delete Account */}
       <Card variant="solid" className="border-error/20">
-        <h3 className="text-s-16 font-bold mb-s-16 tracking-tight">Delete Account</h3>
+        <h3 className="text-s-16 font-bold mb-s-16 tracking-tight">
+          Delete Account
+        </h3>
         <p className="text-s-13 text-text-secondary mb-s-16">
           Before you go...
         </p>
         <ul className="list-disc list-inside text-s-13 text-text-secondary space-y-s-8 mb-s-24">
-          <li>All your data including **API keys, templates, SMTP configs, and logs** will be permanently deleted.</li>
-          <li>You will not be able to create a new account with this email for a short period (cooldown).</li>
-          <li>If you have problems with integration, please contact support, we will help you.</li>
-          <li>If you are interested in receiving newsletters from us, do not delete your account.</li>
+          <li>
+            All your data including **API keys, templates, SMTP configs, and
+            logs** will be permanently deleted.
+          </li>
+          <li>
+            You will not be able to create a new account with this email for a
+            short period (cooldown).
+          </li>
+          <li>
+            If you have problems with integration, please contact support, we
+            will help you.
+          </li>
+          <li>
+            If you are interested in receiving newsletters from us, do not
+            delete your account.
+          </li>
         </ul>
-        <Button 
-          variant="danger" 
-          size="sm" 
+        <Button
+          variant="danger"
+          size="sm"
           icon={<Trash2 className="w-s-14 h-s-14" />}
           onClick={handleDeleteAccount}
           loading={deleteMutation.isPending}
@@ -141,44 +120,60 @@ export function GeneralTab() {
 export function SubscriptionTab() {
   const router = useRouter();
   const { user } = useAuth();
-  
-  const currentPlanId = (user as any)?.planId || 'free';
+
+  const currentPlanId = (user as any)?.planId || "free";
   const currentPlan = plans.find((p) => p.id === currentPlanId) || plans[0];
 
   return (
     <Card variant="solid">
       <div className="flex items-start justify-between mb-s-24">
         <div>
-          <h3 className="text-s-16 font-bold mb-s-4 tracking-tight">Subscription Details</h3>
-          <p className="text-s-13 text-text-secondary">Manage your billing and plan details</p>
+          <h3 className="text-s-16 font-bold mb-s-4 tracking-tight">
+            Subscription Details
+          </h3>
+          <p className="text-s-13 text-text-secondary">
+            Manage your billing and plan details
+          </p>
         </div>
-        <div className={`px-s-12 py-s-4 rounded-full text-s-11 font-bold uppercase tracking-wider ${
-          currentPlan.id === 'free' ? 'bg-bg-elevated text-text-muted' : 'bg-accent/20 text-accent border border-accent/30'
-        }`}>
+        <div
+          className={`px-s-12 py-s-4 rounded-full text-s-11 font-bold uppercase tracking-wider ${
+            currentPlan.id === "free"
+              ? "bg-bg-elevated text-text-muted"
+              : "bg-accent/20 text-accent border border-accent/30"
+          }`}
+        >
           {currentPlan.name}
         </div>
       </div>
-      
+
       <div className="space-y-s-20 text-s-14 max-w-s-500 mb-s-32">
         <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
           <span className="text-text-secondary">Current plan:</span>
           <span className="font-semibold text-text-primary">
-            {currentPlan.name} 
+            {currentPlan.name}
             <span className="text-text-muted font-normal ml-s-8">
-              {currentPlan.price === 0 ? '/ Lifetime Free' : currentPlan.price === null ? '/ Custom' : ` / $${currentPlan.price} mo`}
+              {currentPlan.price === 0
+                ? "/ Lifetime Free"
+                : currentPlan.price === null
+                  ? "/ Custom"
+                  : ` / $${currentPlan.price} mo`}
             </span>
           </span>
         </div>
         <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
           <span className="text-text-secondary">Monthly quota:</span>
           <span className="font-semibold text-text-primary">
-            {currentPlan.features.find((f: string) => f.includes('emails per month'))?.split(' ')[0] || '200'}
+            {currentPlan.features
+              .find((f: string) => f.includes("emails per month"))
+              ?.split(" ")[0] || "200"}
           </span>
         </div>
         <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
           <span className="text-text-secondary">Usage status:</span>
           <div className="flex flex-col gap-s-8">
-            <span className="font-semibold text-text-primary">96.0% remaining</span>
+            <span className="font-semibold text-text-primary">
+              96.0% remaining
+            </span>
             <div className="w-full h-s-6 bg-bg-elevated rounded-full overflow-hidden">
               <div className="h-full bg-success w-[96%]" />
             </div>
@@ -188,25 +183,36 @@ export function SubscriptionTab() {
           <span className="text-text-secondary">Included features:</span>
           <div className="flex flex-wrap gap-s-6">
             {currentPlan.features.slice(0, 4).map((f: string, i: number) => (
-              <span key={i} className="text-s-11 bg-bg-card border border-border px-s-8 py-s-2 rounded-md text-text-secondary">
+              <span
+                key={i}
+                className="text-s-11 bg-bg-card border border-border px-s-8 py-s-2 rounded-md text-text-secondary"
+              >
                 {f}
               </span>
             ))}
-            {currentPlan.features.length > 4 && <span className="text-s-11 text-text-muted">+{currentPlan.features.length - 4} more</span>}
+            {currentPlan.features.length > 4 && (
+              <span className="text-s-11 text-text-muted">
+                +{currentPlan.features.length - 4} more
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       <div className="flex gap-s-12">
-        <Button 
-          variant="primary" 
-          size="sm" 
+        <Button
+          variant="primary"
+          size="sm"
           icon={<Zap className="w-s-14 h-s-14" />}
-          onClick={() => router.push('/dashboard/upgrade')}
+          onClick={() => router.push("/dashboard/upgrade")}
         >
-          {currentPlan.id === 'free' ? 'Upgrade Plan' : 'Change Plan'}
+          {currentPlan.id === "free" ? "Upgrade Plan" : "Change Plan"}
         </Button>
-        <Button variant="ghost" size="sm" className="text-text-muted hover:text-error hover:bg-error/5 border border-transparent hover:border-error/20">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-text-muted hover:text-error hover:bg-error/5 border border-transparent hover:border-error/20"
+        >
           Cancel Subscription
         </Button>
       </div>
@@ -217,8 +223,10 @@ export function SubscriptionTab() {
 export function InvoicesTab() {
   return (
     <Card variant="solid" className="min-h-s-200 flex flex-col">
-      <h3 className="text-s-16 font-bold mb-s-64 tracking-tight">Billing History</h3>
-      
+      <h3 className="text-s-16 font-bold mb-s-64 tracking-tight">
+        Billing History
+      </h3>
+
       <div className="flex-1 flex items-center justify-center text-s-14 text-text-muted">
         Your invoices will appear here
       </div>
@@ -237,10 +245,12 @@ export function SecurityTab() {
         </p>
 
         <div className="max-w-s-800 mb-s-24">
-          <label className="block text-s-12 text-text-secondary mb-s-8 font-medium">Domain <span className="text-error">*</span></label>
+          <label className="block text-s-12 text-text-secondary mb-s-8 font-medium">
+            Domain <span className="text-error">*</span>
+          </label>
           <div className="flex">
-            <Input 
-              placeholder="https://my-site.com" 
+            <Input
+              placeholder="https://my-site.com"
               className="rounded-e-none border-r-0"
             />
             <div className="flex items-center justify-center px-s-16 bg-bg-elevated border border-border border-l-0 rounded-e-s-8 cursor-pointer hover:bg-bg-hover transition-colors text-text-muted">
@@ -252,30 +262,56 @@ export function SecurityTab() {
           </p>
         </div>
 
-        <Button variant="secondary" size="sm" icon={<CheckCircle className="w-s-14 h-s-14" />}>
+        <Button
+          variant="secondary"
+          size="sm"
+          icon={<CheckCircle className="w-s-14 h-s-14" />}
+        >
           Save Changes
         </Button>
       </Card>
 
       {/* API Settings */}
       <Card variant="solid">
-        <h3 className="text-s-16 font-bold mb-s-24 tracking-tight">API Settings</h3>
-        
+        <h3 className="text-s-16 font-bold mb-s-24 tracking-tight">
+          API Settings
+        </h3>
+
         <div className="space-y-s-12 mb-s-24 text-s-14">
           <label className="flex items-center gap-s-12 cursor-pointer">
-            <input type="checkbox" className="w-s-16 h-s-16 rounded-s-4 border-border bg-bg-elevated accent-accent text-accent focus:ring-accent" defaultChecked />
-            <span className="text-text-primary">Allow EmailJS API for non-browser applications.</span>
-            <div className="w-s-14 h-s-14 rounded-full border border-text-muted text-text-muted flex items-center justify-center text-[10px] cursor-help">?</div>
+            <input
+              type="checkbox"
+              className="w-s-16 h-s-16 rounded-s-4 border-border bg-bg-elevated accent-accent text-accent focus:ring-accent"
+              defaultChecked
+            />
+            <span className="text-text-primary">
+              Allow EmailJS API for non-browser applications.
+            </span>
+            <div className="w-s-14 h-s-14 rounded-full border border-text-muted text-text-muted flex items-center justify-center text-[10px] cursor-help">
+              ?
+            </div>
           </label>
-          
+
           <label className="flex items-center gap-s-12 cursor-pointer">
-            <input type="checkbox" className="w-s-16 h-s-16 rounded-s-4 border-border bg-bg-elevated accent-accent text-accent focus:ring-accent" defaultChecked />
-            <span className="text-text-primary">Use Private Key (recommended)</span>
-            <div className="w-s-14 h-s-14 rounded-full border border-text-muted text-text-muted flex items-center justify-center text-[10px] cursor-help">?</div>
+            <input
+              type="checkbox"
+              className="w-s-16 h-s-16 rounded-s-4 border-border bg-bg-elevated accent-accent text-accent focus:ring-accent"
+              defaultChecked
+            />
+            <span className="text-text-primary">
+              Use Private Key (recommended)
+            </span>
+            <div className="w-s-14 h-s-14 rounded-full border border-text-muted text-text-muted flex items-center justify-center text-[10px] cursor-help">
+              ?
+            </div>
           </label>
         </div>
 
-        <Button variant="secondary" size="sm" icon={<CheckCircle className="w-s-14 h-s-14" />}>
+        <Button
+          variant="secondary"
+          size="sm"
+          icon={<CheckCircle className="w-s-14 h-s-14" />}
+        >
           Save Changes
         </Button>
       </Card>

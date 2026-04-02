@@ -26,15 +26,6 @@ export function useVerify() {
   });
 }
 
-// export function useRefreshKeys() {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: () => authApi.refreshKeys(),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ['me'] });
-//     },
-//   });
-// }
 
 export function useDeleteAccount() {
   return useMutation({
