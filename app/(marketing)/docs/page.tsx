@@ -20,12 +20,12 @@ const DOCS_SECTIONS = [
     title: "Getting Started",
     icon: <Play className="w-s-20 h-s-20" />,
     content: `
-      <h3>Welcome to MailFlow Documentation</h3>
-      <p>MailFlow is a powerful email delivery platform that lets you send transactional emails through your own SMTP servers with complete control and transparency.</p>
+      <h3>Welcome to Sendio Documentation</h3>
+      <p>Sendio is a powerful email delivery platform that lets you send transactional emails through your own SMTP servers with complete control and transparency.</p>
       
       <h4>Quick Start (5 minutes)</h4>
       <ol>
-        <li>Create a free account at mailflow.com</li>
+        <li>Create a free account at sendio.in</li>
         <li>Add your SMTP configuration in the Dashboard</li>
         <li>Generate an API key from Settings</li>
         <li>Send your first email using our REST API</li>
@@ -47,21 +47,21 @@ const DOCS_SECTIONS = [
       <h3>Installation & Setup</h3>
       
       <h4>Node.js SDK</h4>
-      <pre>npm install @mailflow/sdk</pre>
+      <pre>npm install @sendio/sdk</pre>
       
       <h4>Python SDK</h4>
-      <pre>pip install mailflow</pre>
+      <pre>pip install sendio</pre>
       
       <h4>cURL Setup</h4>
-      <p>No installation needed! You can use cURL directly with MailFlow API endpoints.</p>
+      <p>No installation needed! You can use cURL directly with Sendio API endpoints.</p>
       
       <h4>Configuration</h4>
       <pre>
-const MailFlow = require('@mailflow/sdk');
+const Sendio = require('@sendio/sdk');
 
-const client = new MailFlow({
+const client = new Sendio({
   apiKey: 'your_api_key_here',
-  apiBaseUrl: 'https://api.mailflow.com/v1'
+  apiBaseUrl: 'https://api.sendio.com/v1'
 });
       </pre>
     `,
@@ -85,7 +85,7 @@ const client = new MailFlow({
 {
   "to": "recipient@example.com",
   "from": "sender@example.com",
-  "subject": "Welcome to MailFlow",
+  "subject": "Welcome to Sendio",
   "html": "&lt;h1&gt;Hello!&lt;/h1&gt;",
   "text": "Hello!",
   "metadata": {
@@ -170,7 +170,7 @@ const client = new MailFlow({
       
       <h4>Node.js Example</h4>
       <pre>
-const client = new MailFlow({ apiKey: 'YOUR_KEY' });
+const client = new Sendio({ apiKey: 'YOUR_KEY' });
 
 await client.emails.send({
   to: 'user@example.com',
@@ -182,7 +182,7 @@ await client.emails.send({
       
       <h4>Python Example</h4>
       <pre>
-from mailflow import Client
+from sendio import Client
 
 client = Client(api_key='YOUR_KEY')
 client.emails.send(
@@ -195,7 +195,7 @@ client.emails.send(
       
       <h4>cURL Example</h4>
       <pre>
-curl -X POST https://api.mailflow.com/v1/emails/send \\
+curl -X POST https://api.sendio.in/v1/emails/send \\
   -H "Authorization: Bearer YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -234,7 +234,7 @@ curl -X POST https://api.mailflow.com/v1/emails/send \\
       </ul>
       
       <h4>Getting Help</h4>
-      <p>Can't find an answer? Contact our support team at support@mailflow.com or use the live chat in the dashboard.</p>
+      <p>Can't find an answer? Contact our support team at support@sendio.in or use the live chat in the dashboard.</p>
     `,
   },
 ];
@@ -258,7 +258,7 @@ export default function DocsPage() {
                 Documentation
               </h1>
               <p className="text-s-18 text-text-secondary max-w-s-600">
-                Complete guides and API reference for MailFlow integration
+                Complete guides and API reference for Sendio integration
               </p>
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function DocsPage() {
           {/* Sidebar Footer Links */}
           <div className="p-s-24 border-t border-border/40 space-y-s-12">
             <a
-              href="https://api.mailflow.io"
+              href="https://api.sendio.in"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-s-10 text-s-13 text-accent hover:text-accent/80 transition-colors no-underline py-s-8"
@@ -305,7 +305,7 @@ export default function DocsPage() {
               <span className="text-s-10">↗</span>
             </a>
             <a
-              href="mailto:support@mailflow.io"
+              href="mailto:support@sendio.in"
               className="flex items-center gap-s-10 text-s-13 text-accent hover:text-accent/80 transition-colors no-underline py-s-8"
             >
               <span>Get Support</span>

@@ -25,7 +25,7 @@ type State = {
 
 const CONVERSATION_TREE: Record<string, State> = {
   start: {
-    message: "Welcome to MailFlow Support. I'm here to help you optimize your transactional email infrastructure. \n\nWhat aspect of the platform can I assist you with?",
+    message: "Welcome to Sendio Support. I'm here to help you optimize your transactional email infrastructure. \n\nWhat aspect of the platform can I assist you with?",
     options: [
       { label: "SMTP Configuration", nextState: "setup_smtp" },
       { label: "Infrastructure Scaling", nextState: "pricing" },
@@ -34,7 +34,7 @@ const CONVERSATION_TREE: Record<string, State> = {
     ],
   },
   setup_smtp: {
-    message: "MailFlow acts as a high-performance abstraction layer for your SMTP providers. \n\n1. Navigate to **Services** to connect AWS SES, SendGrid, or custom relays.\n2. In **Senders**, configure your identities to match your provider's authenticated domains.",
+    message: "Sendio acts as a high-performance abstraction layer for your SMTP providers. \n\n1. Navigate to **Services** to connect AWS SES, SendGrid, or custom relays.\n2. In **Senders**, configure your identities to match your provider's authenticated domains.",
     options: [
       { label: "DNS Requirements", nextState: "verify_domain" },
       { label: "Supported Providers", nextState: "providers" },
@@ -47,7 +47,7 @@ const CONVERSATION_TREE: Record<string, State> = {
     ],
   },
   verify_domain: {
-    message: "To achieve 99%+ deliverability, ensure your DNS includes: \n\n• **SPF**: `v=spf1 include:mailflow.io ~all` \n• **DKIM**: 2048-bit RSA keys (provided in Senders tab) \n• **DMARC**: Policy set to `quarantine` or `reject`.",
+    message: "To achieve 99%+ deliverability, ensure your DNS includes: \n\n• **SPF**: `v=spf1 include:sendio.in ~all` \n• **DKIM**: 2048-bit RSA keys (provided in Senders tab) \n• **DMARC**: Policy set to `quarantine` or `reject`.",
     options: [
       { label: "Open DNS Guide", nextState: "start", link: "/docs/dns" },
     ],
@@ -113,7 +113,7 @@ export function ChatWidget() {
                   <Zap className="w-s-18 h-s-18 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-s-16 font-bold text-text-primary">MailFlow Assistant</h3>
+                  <h3 className="text-s-16 font-bold text-text-primary">Sendio Assistant</h3>
                   <div className="flex items-center gap-s-4">
                     <span className="w-s-8 h-s-8 bg-success rounded-full animate-pulse" />
                     <span className="text-s-12 text-text-secondary">Online</span>
@@ -205,7 +205,7 @@ export function ChatWidget() {
             {/* Footer */}
             <div className="p-s-16 border-t border-border bg-bg-base/50 text-center">
               <p className="text-s-11 text-text-muted">
-                Powered by MailFlow Support Engine
+                Powered by Sendio Support Engine
               </p>
             </div>
           </motion.div>

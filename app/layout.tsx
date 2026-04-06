@@ -4,9 +4,9 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ServiceProvider } from "@/context/ServiceContext";
 
 export const metadata: Metadata = {
-  title: { default: "MailFlow", template: "%s | MailFlow" },
+  title: { default: "Sendio", template: "%s | Sendio" },
   description:
-    "User-owned SMTP email platform – send transactional emails through your own credentials.",
+    "User-owned SMTP email platform – send transactional emails through your own credentials with Sendio.",
 };
 
 import { ToastProvider } from "@/context/ToastContext";

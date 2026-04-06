@@ -13,7 +13,7 @@ import {
 
 const FAQ = [
   {
-    question: "How do I get started with MailFlow?",
+    question: "How do I get started with Sendio?",
     answer:
       "Sign up for a free account, verify your email, and you can start sending emails immediately. Check our getting started guide for detailed setup instructions.",
   },
@@ -84,10 +84,10 @@ export default function SupportPage() {
                 Send us an email anytime
               </p>
               <a
-                href="mailto:support@mailflow.com"
+                href="mailto:support@sendio.in"
                 className="text-success text-s-14 font-bold hover:underline"
               >
-                support@mailflow.com →
+                support@sendio.in →
               </a>
             </div>
 

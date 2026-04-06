@@ -85,7 +85,7 @@ export function StatsSection() {
 
             {/* Sub-copy */}
             <p className="text-s-18 text-gray-400 mb-s-40 max-w-s-640 mx-auto leading-s-28">
-              Join thousands of developers who trust MailX for their
+              Join thousands of developers who trust Sendio for their
               transactional email needs.
             </p>
 

@@ -52,7 +52,7 @@ const POLICIES = [
       </ul>
       
       <h4>6. Contact Us</h4>
-      <p>For privacy concerns, email: privacy@mailflow.com</p>
+      <p>For privacy concerns, email: privacy@sendio.in</p>
     `,
   },
   {
@@ -64,10 +64,10 @@ const POLICIES = [
       <p>Last updated: March 1, 2026</p>
       
       <h4>1. Acceptance of Terms</h4>
-      <p>By using MailFlow, you agree to comply with these terms. If you don't agree, you may not use our service.</p>
+      <p>By using Sendio, you agree to comply with these terms. If you don't agree, you may not use our service.</p>
       
       <h4>2. Use License</h4>
-      <p>We grant you a limited, non-exclusive, non-transferable license to use MailFlow for legitimate business purposes.</p>
+      <p>We grant you a limited, non-exclusive, non-transferable license to use Sendio for legitimate business purposes.</p>
       
       <h4>3. User Responsibilities</h4>
       <ul>
@@ -78,7 +78,7 @@ const POLICIES = [
       </ul>
       
       <h4>4. Email Content Restrictions</h4>
-      <p>You may not use MailFlow to send:</p>
+      <p>You may not use Sendio to send:</p>
       <ul>
         <li>Spam or unsolicited bulk emails</li>
         <li>Phishing or malicious content</li>
@@ -87,7 +87,7 @@ const POLICIES = [
       </ul>
       
       <h4>5. Limitation of Liability</h4>
-      <p>MailFlow provides the service "as is". We are not liable for indirect, incidental, or consequential damages.</p>
+      <p>Sendio provides the service "as is". We are not liable for indirect, incidental, or consequential damages.</p>
       
       <h4>6. Service Modifications</h4>
       <p>We reserve the right to modify or discontinue the service with notice. We will not be liable for modifications.</p>
@@ -139,7 +139,7 @@ const POLICIES = [
       <p>Last updated: March 1, 2026</p>
       
       <h4>1. Prohibited Activities</h4>
-      <p>You may not use MailFlow for:</p>
+      <p>You may not use Sendio for:</p>
       <ul>
         <li>Sending spam or unsolicited emails</li>
         <li>Sending emails without proper consent</li>
@@ -255,10 +255,10 @@ export default function PolicyPage() {
                 team.
               </p>
               <a
-                href="mailto:legal@mailflow.com"
+                href="mailto:legal@sendio.in"
                 className="text-accent text-s-14 font-bold hover:underline flex items-center gap-s-8"
               >
-                legal@mailflow.com <ExternalLink className="w-s-12 h-s-12" />
+                legal@sendio.in <ExternalLink className="w-s-12 h-s-12" />
               </a>
             </div>
 

@@ -131,7 +131,7 @@ export default function ResourcesPage() {
             Resources & <span className="gradient-text">Documentation</span>
           </h1>
           <p className="text-s-18 text-text-secondary max-w-s-700 mx-auto leading-relaxed">
-            Everything you need to integrate and master MailFlow. From API docs
+            Everything you need to integrate and master Sendio. From API docs
             to video tutorials, we've got you covered.
           </p>
         </div>

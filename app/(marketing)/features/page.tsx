@@ -217,7 +217,7 @@ export default function FeaturesPage() {
                 Ready to get started?
               </h2>
               <p className="text-s-18 text-gray-400 mb-s-40 max-w-s-560 mx-auto leading-s-28">
-                Join thousands of developers who trust MailX for their
+                Join thousands of developers who trust Sendio for their
                 transactional emails.
               </p>
 

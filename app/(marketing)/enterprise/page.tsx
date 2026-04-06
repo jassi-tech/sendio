@@ -137,7 +137,7 @@ export default function EnterprisePage() {
               Ready for Enterprise?
             </h2>
             <p className="text-s-16 text-text-secondary mb-s-48 leading-relaxed max-w-s-600 mx-auto">
-              Let's discuss how MailFlow can support your enterprise needs with
+              Let's discuss how Sendio can support your enterprise needs with
               custom solutions tailored to your requirements.
             </p>
             <div className="flex items-center justify-center gap-s-16 flex-wrap">

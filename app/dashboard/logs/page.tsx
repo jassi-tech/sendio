@@ -74,7 +74,7 @@ export default function LogsPage() {
             <div>
               <h3 className="text-s-18 font-bold text-text-primary">No Activity Recorded</h3>
               <p className="text-text-secondary text-s-14 max-w-s-300 mx-auto">
-                Logs will appear here once you start sending emails through the MailFlow API.
+                Logs will appear here once you start sending emails through the Sendio API.
               </p>
             </div>
           </div>

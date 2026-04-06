@@ -18,7 +18,7 @@ export function Navbar() {
             <Mail className="w-s-16 h-s-16 text-white" />
           </div>
           <span className="text-s-18 font-bold text-text-primary tracking-tight transition-colors group-hover:text-accent">
-            MailFlow
+            Sendio
           </span>
         </Link>
 

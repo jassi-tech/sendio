@@ -56,7 +56,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
           <Mail className="w-s-24 h-s-24 text-white" />
         </div>
         <span className="text-s-24 font-black text-text-primary tracking-tight">
-          MailFlow
+          Sendio
         </span>
       </div>
 

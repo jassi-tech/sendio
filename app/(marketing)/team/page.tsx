@@ -10,7 +10,7 @@ const TEAM_MEMBERS = [
     role: "Co-Founder & CEO",
     bio: "Former Senior Engineer at SendGrid (2012-2018). Led infrastructure teams at AWS (2018-2021). 15+ years building scalable email systems.",
     image: "👩‍💼",
-    social: { linkedin: "#", twitter: "#", email: "sarah@mailflow.com" },
+    social: { linkedin: "#", twitter: "#", email: "sarah@sendio.in" },
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ const TEAM_MEMBERS = [
     role: "Co-Founder & CTO",
     bio: "PhD in Computer Science from MIT. Former Tech Lead at Google Cloud. Expert in distributed systems and API design.",
     image: "👨‍💻",
-    social: { linkedin: "#", github: "#", email: "alex@mailflow.com" },
+    social: { linkedin: "#", github: "#", email: "alex@sendio.in" },
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ const TEAM_MEMBERS = [
     role: "Head of Product",
     bio: "Product Management at Stripe and Twilio. Obsessed with developer experience. 10+ years in B2B SaaS.",
     image: "👩‍🔬",
-    social: { linkedin: "#", twitter: "#", email: "emma@mailflow.com" },
+    social: { linkedin: "#", twitter: "#", email: "emma@sendio.in" },
   },
   {
     id: 4,
@@ -34,7 +34,7 @@ const TEAM_MEMBERS = [
     role: "VP of Engineering",
     bio: "Former Engineering Manager at Postmark. Led teams of 30+ engineers. Specialized in infrastructure and reliability.",
     image: "👨‍🏫",
-    social: { linkedin: "#", github: "#", email: "david@mailflow.com" },
+    social: { linkedin: "#", github: "#", email: "david@sendio.in" },
   },
   {
     id: 5,
@@ -42,7 +42,7 @@ const TEAM_MEMBERS = [
     role: "VP of Customer Success",
     bio: "Built customer success from zero to $50M ARR at previous startup. Customer obsessed and metrics-driven.",
     image: "👩‍💼",
-    social: { linkedin: "#", email: "lisa@mailflow.com" },
+    social: { linkedin: "#", email: "lisa@sendio.in" },
   },
   {
     id: 6,
@@ -50,7 +50,7 @@ const TEAM_MEMBERS = [
     role: "VP of Security & Compliance",
     bio: "CISSP certified. 12 years at cybersecurity firms. Led security at $1B+ companies. SOC 2 & GDPR expert.",
     image: "🔐",
-    social: { linkedin: "#", github: "#", email: "james@mailflow.com" },
+    social: { linkedin: "#", github: "#", email: "james@sendio.in" },
   },
   {
     id: 7,
@@ -58,7 +58,7 @@ const TEAM_MEMBERS = [
     role: "VP of Sales",
     bio: "Enterprise sales background at Salesforce and HubSpot. Built sales teams from 0 to 100+ headcount.",
     image: "📊",
-    social: { linkedin: "#", email: "michael@mailflow.com" },
+    social: { linkedin: "#", email: "michael@sendio.in" },
   },
   {
     id: 8,
@@ -66,7 +66,7 @@ const TEAM_MEMBERS = [
     role: "Director of DevRel & Community",
     bio: "Former Developer Advocate at GitHub and Slack. Community builder with 500K+ developers reached.",
     image: "🎤",
-    social: { linkedin: "#", twitter: "#", email: "jennifer@mailflow.com" },
+    social: { linkedin: "#", twitter: "#", email: "jennifer@sendio.in" },
   },
   {
     id: 9,
@@ -74,7 +74,7 @@ const TEAM_MEMBERS = [
     role: "Senior Architect",
     bio: "Database expert with 20+ years experience. Architected systems handling 100K+ RPS.",
     image: "🏗️",
-    social: { linkedin: "#", github: "#", email: "mark@mailflow.com" },
+    social: { linkedin: "#", github: "#", email: "mark@sendio.in" },
   },
 ];
 
@@ -112,7 +112,7 @@ export default function TeamPage() {
       <section className="pt-s-120 pb-s-80 px-s-40">
         <div className="max-w-s-1000 mx-auto text-center">
           <h1 className="text-s-64 font-extrabold mb-s-32 leading-tight">
-            Meet the <span className="gradient-text">MailFlow team</span>
+            Meet the <span className="gradient-text">Sendio team</span>
           </h1>
           <p className="text-s-18 text-text-secondary max-w-s-700 mx-auto leading-relaxed">
             We're a team of passionate developers and builders dedicated to
@@ -220,13 +220,13 @@ export default function TeamPage() {
 
           <div className="space-y-s-24 text-s-16 text-text-secondary leading-relaxed">
             <p>
-              MailFlow was founded in 2023 by a group of engineers who were
+              Sendio was founded in 2023 by a group of engineers who were
               frustrated with existing email delivery platforms. They wanted a
               service that gave developers complete control, transparency, and
               the ability to use their own infrastructure.
             </p>
             <p>
-              Today, MailFlow powers transactional emails for thousands of
+              Today, Sendio powers transactional emails for thousands of
               developers and companies worldwide. We're backed by leading
               venture capital firms and are on a mission to make email delivery
               simple, secure, and developer-friendly.

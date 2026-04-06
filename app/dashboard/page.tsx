@@ -137,7 +137,7 @@ export default function OverviewPage() {
             </div>
             <div>
               <h2 className="text-s-24 font-black text-text-primary mb-s-8">
-                Welcome to MailFlow
+                Welcome to Sendio
               </h2>
               <p className="text-text-secondary text-s-15 leading-relaxed">
                 Connect your SMTP credentials and start sending transactional

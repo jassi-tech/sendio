@@ -13,7 +13,7 @@ export function Footer() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-s-60 mb-s-80">
             {/* Brand Section */}
             <div>
-              <h3 className="text-s-16 font-bold text-text-primary mb-s-20">MailFlow</h3>
+              <h3 className="text-s-16 font-bold text-text-primary mb-s-20">Sendio</h3>
               <p className="text-s-13 text-text-secondary leading-relaxed">
                 Your SMTP infrastructure with complete control. Built for developers who value privacy and performance.
               </p>
@@ -37,7 +37,7 @@ export function Footer() {
                 <li><Link href="/team" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Team</Link></li>
                 <li><Link href="/enterprise" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Enterprise</Link></li>
                 <li><Link href="/support" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Support</Link></li>
-                <li><a href="https://blog.mailflow.io" target="_blank" rel="noopener noreferrer" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Blog</a></li>
+                <li><a href="https://blog.sendio.in" target="_blank" rel="noopener noreferrer" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Blog</a></li>
               </ul>
             </div>
 
@@ -48,7 +48,7 @@ export function Footer() {
                 <li><Link href="/policy?tab=privacy" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Privacy Policy</Link></li>
                 <li><Link href="/policy?tab=terms" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Terms of Service</Link></li>
                 <li><Link href="/policy?tab=cookies" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Cookie Policy</Link></li>
-                <li><a href="mailto:legal@mailflow.io" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Contact Legal</a></li>
+                <li><a href="mailto:legal@sendio.in" className="text-s-13 text-text-secondary hover:text-text-primary transition-colors no-underline">Contact Legal</a></li>
               </ul>
             </div>
           </div>
@@ -56,7 +56,7 @@ export function Footer() {
           {/* Divider */}
           <div className="border-t border-border/40 pt-s-40 flex flex-col sm:flex-row items-center justify-between">
             <p className="text-s-13 text-text-muted">
-              &copy; {currentYear} MailFlow. All Rights Reserved.
+              &copy; {currentYear} Sendio. All Rights Reserved.
             </p>
             
             <div className="flex items-center gap-s-24 mt-s-24 sm:mt-0">

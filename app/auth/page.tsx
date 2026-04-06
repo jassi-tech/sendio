@@ -49,7 +49,7 @@ export default function AuthPage() {
             <div className="w-s-44 h-s-44 bg-gradient-to-br from-accent to-accent-dim rounded-s-12 flex items-center justify-center shadow-accent-glow">
               <Mail className="w-s-22 h-s-22 text-white" />
             </div>
-            <span className="text-s-28 font-extrabold tracking-tight bg-gradient-to-br from-text-primary to-text-secondary bg-clip-text text-transparent">MailFlow</span>
+            <span className="text-s-28 font-extrabold tracking-tight bg-gradient-to-br from-text-primary to-text-secondary bg-clip-text text-transparent">Sendio</span>
           </div>
           <p className="text-s-15 text-text-secondary">
             Your SMTP. Your emails. Your control.
@@ -61,7 +61,7 @@ export default function AuthPage() {
           {!sent ? (
             <>
               <h1 className="text-s-22 font-bold mb-s-8 text-text-primary">
-                Sign in to MailFlow
+                Sign in to Sendio
               </h1>
               <p className="text-s-14 text-text-secondary mb-s-28">
                 Enter your email and we&apos;ll send you a link.
