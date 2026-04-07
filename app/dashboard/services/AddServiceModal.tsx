@@ -48,16 +48,13 @@ export function AddServiceModal({
             <span className="font-bold text-s-12">SMTP</span>
           </div>
         ) : service.logoUrl ? (
-          <Image
+          <img
             src={service.logoUrl}
             alt={service.name}
-            width={24}
-            height={24}
             className="w-full h-full object-contain"
             onError={(e) => {
-              // Add a fallback class or handling here if Next/Image fails, though it handles it better
               const target = e.target as HTMLImageElement;
-              target.srcset = ""; // Clear srcset
+              target.onerror = null; // Prevent infinite loop
               target.src =
                 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
             }}

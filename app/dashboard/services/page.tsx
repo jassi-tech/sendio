@@ -14,6 +14,7 @@ import type { SmtpService } from "@/lib/interface";
 import Image from "next/image";
 import { useSMTPList, useDeleteSMTP, useUpdateSMTP } from "@/hooks/useSMTP";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServices } from "@/hooks/useServices";
 
 export default function ServicesPage() {
   const { showToast, confirmToast } = useToast();
@@ -27,6 +28,7 @@ export default function ServicesPage() {
   
   const queryClient = useQueryClient();
   const { data: rawServices = [], isLoading: loading } = useSMTPList();
+  const { data: catalogue = [] } = useServices();
   const services = rawServices as SmtpService[];
   const deleteMutation = useDeleteSMTP();
   const updateMutation = useUpdateSMTP();
@@ -49,12 +51,11 @@ export default function ServicesPage() {
   }, [openMenuId]);
 
   const getProviderLogo = (provider?: string) => {
-    if (!provider || provider.toLowerCase() === "smtp") return ""; // Empty string forces onError to show SVG
-    if (provider.toLowerCase() === "gmail") {
-      return "https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png";
-    }
-    // generic fallback logic
-    return `/${provider.toLowerCase()}.png`;
+    if (!provider || provider.toLowerCase() === "smtp") return "";
+    
+    // Find the logo from the catalogue
+    const serviceDef = catalogue.find(s => s.id === provider);
+    return serviceDef?.logoUrl || "";
   };
 
   const maskServiceId = (id: string) => {
@@ -125,15 +126,13 @@ export default function ServicesPage() {
                 <div className="flex items-center gap-s-24">
                   <div className="w-s-40 h-s-40 shrink-0 flex items-center justify-center bg-white rounded-s-8 p-s-8 shadow-sm">
                     {getProviderLogo(service.provider) ? (
-                      <Image
+                      <img
                         src={getProviderLogo(service.provider)}
                         alt={service.provider}
-                        width={24}
-                        height={24}
                         className="w-full h-full object-contain"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.srcset = "";
+                          target.onerror = null;
                           target.src =
                             'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
                         }}

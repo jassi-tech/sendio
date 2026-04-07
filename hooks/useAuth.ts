@@ -32,3 +32,42 @@ export function useDeleteAccount() {
     mutationFn: () => authApi.deleteAccount(),
   });
 }
+
+export function useRequestEmailChange() {
+  return useMutation({
+    mutationFn: (newEmail: string) => authApi.requestEmailChange(newEmail),
+  });
+}
+
+export function useVerifyEmailChange() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (code: string) => authApi.verifyEmailChange(code),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] });
+    },
+  });
+}
+
+export function useSubscription() {
+  return useQuery({
+    queryKey: ['subscription'],
+    queryFn: () => authApi.getSubscription(),
+  });
+}
+
+export function useUpgradePlan() {
+  return useMutation({
+    mutationFn: () => authApi.upgradePlan(),
+  });
+}
+
+export function useCancelSubscription() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => authApi.cancelSubscription(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    },
+  });
+}

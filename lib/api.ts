@@ -65,8 +65,22 @@ export const authApi = {
     request('/auth/magic-link', { method: 'POST', body: JSON.stringify({ email }) }),
   verify: (token: string) =>
     request<{ token: string; user: { id: string; email: string; name?: string } }>(`/auth/verify?token=${token}`),
-  me: () => request<{ id: string; email: string; name?: string }>('/auth/me'),
+  me: () => request<{ id: string; email: string; name?: string; createdAt: string }>('/auth/me'),
   deleteAccount: () => request('/auth/me', { method: 'DELETE' }),
+  requestEmailChange: (newEmail: string) =>
+    request('/auth/email-change/request', { method: 'POST', body: JSON.stringify({ newEmail }) }),
+  verifyEmailChange: (code: string) =>
+    request<{ newEmail: string }>('/auth/email-change/verify', { method: 'POST', body: JSON.stringify({ code }) }),
+  getSubscription: () => request<{ 
+    plan: string; 
+    monthlyQuota: number; 
+    used: number; 
+    remaining: number; 
+    remainingPercentage: number; 
+    includedFeatures: string[] 
+  }>('/auth/subscription'),
+  upgradePlan: () => request('/auth/subscription/upgrade', { method: 'POST' }),
+  cancelSubscription: () => request('/auth/subscription/cancel', { method: 'POST' }),
 };
 
 // SMTP

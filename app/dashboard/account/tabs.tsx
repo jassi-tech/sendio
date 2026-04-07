@@ -1,11 +1,19 @@
 "use client";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useDeleteAccount } from "@/hooks/useAuth";
+import { 
+  useDeleteAccount, 
+  useRequestEmailChange, 
+  useVerifyEmailChange,
+  useSubscription,
+  useUpgradePlan,
+  useCancelSubscription
+} from "@/hooks/useAuth";
 import { useToast } from "@/context/ToastContext";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import {
   Trash2,
   CheckCircle,
@@ -14,14 +22,139 @@ import {
   Check,
   X,
   Zap,
+  Mail,
+  ArrowRight,
+  ShieldCheck,
+  Loader2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { plans } from "@/lib/pricing";
 
+function EmailChangeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { showToast } = useToast();
+  const [step, setStep] = useState<"email" | "otp">("email");
+  const [newEmail, setNewEmail] = useState("");
+  const [otp, setOtp] = useState("");
+
+  const requestMutation = useRequestEmailChange();
+  const verifyMutation = useVerifyEmailChange();
+
+  const handleRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmail) return;
+    try {
+      await requestMutation.mutateAsync(newEmail);
+      showToast("Verification code sent to your new email", "success");
+      setStep("otp");
+    } catch (err: any) {
+      showToast(err.message || "Failed to request email change", "error");
+    }
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp) return;
+    try {
+      await verifyMutation.mutateAsync(otp);
+      showToast("Email updated successfully", "success");
+      onClose();
+      // Reset state for next time
+      setStep("email");
+      setNewEmail("");
+      setOtp("");
+    } catch (err: any) {
+      showToast(err.message || "Verification failed", "error");
+    }
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={step === "email" ? "Change Email Address" : "Verify Your Email"}
+    >
+      {step === "email" ? (
+        <form onSubmit={handleRequest} className="space-y-s-20">
+          <p className="text-s-13 text-text-secondary leading-relaxed">
+            Enter the new email address you'd like to use. We'll send a 6-digit verification code to this address.
+          </p>
+          <div className="space-y-s-8">
+            <label className="text-s-12 font-bold text-text-secondary uppercase tracking-wider">
+              New Email Address
+            </label>
+            <Input
+              type="email"
+              placeholder="new-email@example.com"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full h-s-48"
+            loading={requestMutation.isPending}
+            icon={<ArrowRight className="w-s-18 h-s-18" />}
+          >
+            Send Verification Code
+          </Button>
+        </form>
+      ) : (
+        <form onSubmit={handleVerify} className="space-y-s-20">
+          <div className="flex flex-col items-center text-center gap-s-16 mb-s-8">
+            <div className="w-s-56 h-s-56 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+              <ShieldCheck className="w-s-28 h-s-28" />
+            </div>
+            <div>
+              <p className="text-s-13 text-text-secondary">
+                We've sent a 6-digit code to <span className="font-bold text-text-primary px-s-4 py-s-1 bg-bg-elevated rounded-s-4 border border-border/50">{newEmail}</span>
+              </p>
+            </div>
+          </div>
+          <div className="space-y-s-8">
+            <label className="text-s-12 font-bold text-text-secondary uppercase tracking-wider block text-center">
+              Verification Code
+            </label>
+            <Input
+              placeholder="000000"
+              className="text-center text-s-24 font-bold tracking-[0.5em] h-s-64"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              required
+              autoFocus
+            />
+          </div>
+          <div className="flex flex-col gap-s-12">
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full h-s-48"
+              loading={verifyMutation.isPending}
+              icon={<CheckCircle className="w-s-18 h-s-18" />}
+            >
+              Verify & Update Email
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="text-text-muted hover:text-text-primary"
+              onClick={() => setStep("email")}
+            >
+              Back to change email
+            </Button>
+          </div>
+        </form>
+      )}
+    </Modal>
+  );
+}
+
 export function GeneralTab() {
   const { showToast } = useToast();
   const { user, logout } = useAuth();
-  // const { user, fetchUser, logout } = useAuth();
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
   const deleteMutation = useDeleteAccount();
 
@@ -71,11 +204,17 @@ export function GeneralTab() {
             variant="secondary"
             size="sm"
             icon={<CheckCircle className="w-s-14 h-s-14" />}
+            onClick={() => setIsEmailModalOpen(true)}
           >
             Change
           </Button>
         </div>
       </Card>
+
+      <EmailChangeModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+      />
 
       {/* Delete Account */}
       <Card variant="solid" className="border-error/20">
@@ -118,11 +257,46 @@ export function GeneralTab() {
 }
 
 export function SubscriptionTab() {
-  const router = useRouter();
-  const { user } = useAuth();
+  const { showToast } = useToast();
+  const { data: sub, isLoading, error } = useSubscription();
+  const upgradeMutation = useUpgradePlan();
+  const cancelMutation = useCancelSubscription();
 
-  const currentPlanId = (user as any)?.planId || "free";
-  const currentPlan = plans.find((p) => p.id === currentPlanId) || plans[0];
+  if (isLoading) {
+    return (
+      <Card variant="solid" className="flex items-center justify-center p-s-64">
+        <Loader2 className="w-s-24 h-s-24 animate-spin text-accent" />
+      </Card>
+    );
+  }
+
+  if (error || !sub) {
+    return (
+      <Card variant="solid" className="p-s-32 text-center">
+        <p className="text-error mb-s-16">Failed to load subscription details</p>
+        <Button variant="secondary" onClick={() => window.location.reload()}>Retry</Button>
+      </Card>
+    );
+  }
+
+  const handleUpgrade = async () => {
+    try {
+      await upgradeMutation.mutateAsync();
+      showToast("Upgrade initiated. Redirecting to payment...", "success");
+    } catch (err: any) {
+      showToast(err.message || "Failed to initiate upgrade", "error");
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm("Are you sure you want to cancel your subscription? You will be moved to the Free plan.")) return;
+    try {
+      await cancelMutation.mutateAsync();
+      showToast("Subscription cancelled", "success");
+    } catch (err: any) {
+      showToast(err.message || "Failed to cancel subscription", "error");
+    }
+  };
 
   return (
     <Card variant="solid">
@@ -137,12 +311,12 @@ export function SubscriptionTab() {
         </div>
         <div
           className={`px-s-12 py-s-4 rounded-full text-s-11 font-bold uppercase tracking-wider ${
-            currentPlan.id === "free"
+            sub.plan.toLowerCase() === "free"
               ? "bg-bg-elevated text-text-muted"
               : "bg-accent/20 text-accent border border-accent/30"
           }`}
         >
-          {currentPlan.name}
+          {sub.plan}
         </div>
       </div>
 
@@ -150,39 +324,36 @@ export function SubscriptionTab() {
         <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
           <span className="text-text-secondary">Current plan:</span>
           <span className="font-semibold text-text-primary">
-            {currentPlan.name}
+            {sub.plan}
             <span className="text-text-muted font-normal ml-s-8">
-              {currentPlan.price === 0
-                ? "/ Lifetime Free"
-                : currentPlan.price === null
-                  ? "/ Custom"
-                  : ` / $${currentPlan.price} mo`}
+              {sub.plan.toLowerCase() === "free" ? "/ Lifetime Free" : "/ Active Subscription"}
             </span>
           </span>
         </div>
         <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
           <span className="text-text-secondary">Monthly quota:</span>
           <span className="font-semibold text-text-primary">
-            {currentPlan.features
-              .find((f: string) => f.includes("emails per month"))
-              ?.split(" ")[0] || "200"}
+            {sub.monthlyQuota}
           </span>
         </div>
         <div className="grid grid-cols-[1fr_2fr] gap-s-16 border-b border-border/40 pb-s-12">
           <span className="text-text-secondary">Usage status:</span>
           <div className="flex flex-col gap-s-8">
             <span className="font-semibold text-text-primary">
-              96.0% remaining
+              {sub.remainingPercentage}% remaining
             </span>
             <div className="w-full h-s-6 bg-bg-elevated rounded-full overflow-hidden">
-              <div className="h-full bg-success w-[96%]" />
+              <div 
+                className={`h-full ${sub.remainingPercentage < 10 ? 'bg-error' : 'bg-success'}`}
+                style={{ width: `${sub.remainingPercentage}%` }} 
+              />
             </div>
           </div>
         </div>
         <div className="grid grid-cols-[1fr_2fr] gap-s-16 pb-s-12">
           <span className="text-text-secondary">Included features:</span>
           <div className="flex flex-wrap gap-s-6">
-            {currentPlan.features.slice(0, 4).map((f: string, i: number) => (
+            {sub.includedFeatures.map((f: string, i: number) => (
               <span
                 key={i}
                 className="text-s-11 bg-bg-card border border-border px-s-8 py-s-2 rounded-md text-text-secondary"
@@ -190,11 +361,6 @@ export function SubscriptionTab() {
                 {f}
               </span>
             ))}
-            {currentPlan.features.length > 4 && (
-              <span className="text-s-11 text-text-muted">
-                +{currentPlan.features.length - 4} more
-              </span>
-            )}
           </div>
         </div>
       </div>
@@ -204,17 +370,22 @@ export function SubscriptionTab() {
           variant="primary"
           size="sm"
           icon={<Zap className="w-s-14 h-s-14" />}
-          onClick={() => router.push("/dashboard/upgrade")}
+          onClick={handleUpgrade}
+          loading={upgradeMutation.isPending}
         >
-          {currentPlan.id === "free" ? "Upgrade Plan" : "Change Plan"}
+          {sub.plan.toLowerCase() === "free" ? "Upgrade Plan" : "Change Plan"}
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-text-muted hover:text-error hover:bg-error/5 border border-transparent hover:border-error/20"
-        >
-          Cancel Subscription
-        </Button>
+        {sub.plan.toLowerCase() !== "free" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-text-muted hover:text-error hover:bg-error/5 border border-transparent hover:border-error/20"
+            onClick={handleCancel}
+            loading={cancelMutation.isPending}
+          >
+            Cancel Subscription
+          </Button>
+        )}
       </div>
     </Card>
   );

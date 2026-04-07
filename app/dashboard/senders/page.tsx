@@ -59,15 +59,15 @@ export default function SendersPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this sender profile?')) return;
-    try {
-      await deleteMutation.mutateAsync(id);
-      showToast('Sender profile deleted', 'success');
-    } catch (e: any) {
-      showToast(e.message || 'Failed to delete', 'error');
-    }
-  };
+  // const handleDelete = async (id: string) => {
+  //   if (!confirm('Delete this sender profile?')) return;
+  //   try {
+  //     await deleteMutation.mutateAsync(id);
+  //     showToast('Sender profile deleted', 'success');
+  //   } catch (e: any) {
+  //     showToast(e.message || 'Failed to delete', 'error');
+  //   }
+  // };
 
   return (
     <div className="animate-fade-in space-y-s-32">
@@ -210,7 +210,7 @@ export default function SendersPage() {
                   <TD className="hidden xl:table-cell">
                      <Badge variant="success" icon={<Wifi size={10} />}>Connected</Badge>
                   </TD>
-                  <TD className="text-right">
+                  {/* <TD className="text-right">
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -218,7 +218,7 @@ export default function SendersPage() {
                       onClick={() => handleDelete(cfg._id)}
                       icon={<Trash2 size={16} />}
                     />
-                  </TD>
+                  </TD> */}
                 </TR>
               ))}
             </TBody>

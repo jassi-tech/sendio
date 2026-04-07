@@ -27,6 +27,9 @@ export function ConfigServiceModal({
   const [fromName, setFromName] = useState("");
   const [fromEmail, setFromEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [host, setHost] = useState("");
+  const [port, setPort] = useState(587);
+  const [secure, setSecure] = useState(false);
 
   const { setActiveServiceId } = useServiceContext();
 
@@ -40,6 +43,9 @@ export function ConfigServiceModal({
       // Reset sensitive fields
       setConnectedEmail(null);
       setPassword("");
+      setHost(serviceDef.smtpHost || "");
+      setPort(serviceDef.smtpPort || 587);
+      setSecure(serviceDef.smtpSecure ?? (serviceDef.smtpPort === 465));
     }
   }, [isOpen, serviceDef]);
 
@@ -79,9 +85,9 @@ export function ConfigServiceModal({
         serviceId,
         label: name,
         provider: serviceDef.id,
-        host: serviceDef.smtpHost || "",
-        port: serviceDef.smtpPort || 587,
-        secure: serviceDef.smtpSecure ?? (serviceDef.smtpPort === 465),
+        host: serviceDef.id === "smtp" ? host : (serviceDef.smtpHost || ""),
+        port: serviceDef.id === "smtp" ? port : (serviceDef.smtpPort || 587),
+        secure: serviceDef.id === "smtp" ? secure : (serviceDef.smtpSecure ?? (serviceDef.smtpPort === 465)),
         user: isOauth ? (connectedEmail || "") : fromEmail,
         password: isOauth ? " " : password,
         isDefault: false,
@@ -111,9 +117,15 @@ export function ConfigServiceModal({
   // Mocking the limit per day as per design for Gmail
   const limitText =
     serviceDef.id === "gmail"
-      ? "500 emails per day"
+      ? "200 emails per day"
       : serviceDef.id === "outlook"
-      ? "10,000 emails per day"
+      ? "200 emails per day"
+      : serviceDef.id === "yahoo" || serviceDef.id === "aol"
+      ? "200 emails per day"
+      : serviceDef.id === "zoho"
+      ? "200 emails per day"
+      : serviceDef.category === "transactional"
+      ? "High volume (Check provider plan)"
       : "Limit depends on provider";
 
   const handleConnect = () => {
@@ -158,15 +170,13 @@ export function ConfigServiceModal({
           <div className="flex items-center gap-s-16 p-s-24 border-b border-border-dim">
             <div className="w-s-48 h-s-48 shrink-0 flex items-center justify-center bg-white rounded-s-8 p-s-8 border border-border">
               {getProviderLogo() ? (
-                <Image
+                <img
                   src={getProviderLogo()}
                   alt={serviceDef.name}
-                  width={32}
-                  height={32}
                   className="w-full h-full object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.srcset = "";
+                    target.onerror = null;
                     target.src =
                       'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%235c5c78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
                   }}
@@ -247,6 +257,46 @@ export function ConfigServiceModal({
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your 16-character app password"
               />
+            )}
+            
+            {serviceDef.id === "smtp" && (
+              <div className="flex flex-col gap-s-24">
+                <Input
+                  label="SMTP Host *"
+                  value={host}
+                  onChange={(e) => setHost(e.target.value)}
+                  placeholder="e.g. smtp.example.com"
+                />
+                <div className="flex gap-s-16">
+                  <div className="flex-1">
+                    <Input
+                      label="SMTP Port *"
+                      type="number"
+                      value={port}
+                      onChange={(e) => setPort(parseInt(e.target.value) || 587)}
+                      placeholder="587"
+                    />
+                  </div>
+                  <div className="flex-1 flex flex-col justify-end pb-s-8">
+                    <label className="flex items-center gap-s-12 cursor-pointer group">
+                      <div
+                        className={`w-s-20 h-s-20 rounded-s-6 border flex items-center justify-center transition-all ${secure ? "bg-accent border-accent shadow-accent-glow" : "border-border group-hover:border-accent"}`}
+                      >
+                        {secure && <Check size={14} className="text-white" />}
+                      </div>
+                      <input
+                        type="checkbox"
+                        className="hidden"
+                        checked={secure}
+                        onChange={() => setSecure(!secure)}
+                      />
+                      <span className="text-s-14 text-text-secondary group-hover:text-text-primary transition-colors font-medium">
+                        Secure SSL/TLS
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Service ID Input (Readonly for preview/mock) */}
