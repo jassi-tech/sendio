@@ -19,6 +19,7 @@ import { useServices } from "@/hooks/useServices";
 export default function ServicesPage() {
   const { showToast, confirmToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log("isModalOpen:", isModalOpen);
   const [editingService, setEditingService] = useState<SmtpService | null>(
     null,
   );
@@ -283,6 +284,7 @@ export default function ServicesPage() {
       />
 
       <EditServiceModal
+        key={editingService?._id || editingService?.id || "edit-service-modal"}
         isOpen={!!editingService}
         onClose={() => setEditingService(null)}
         service={editingService}
