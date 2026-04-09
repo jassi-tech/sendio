@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { X, HelpCircle, Check, Copy } from "lucide-react";
+import React, { useState } from "react";
+import { HelpCircle, Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { ServiceDef, smtpApi } from "@/lib/api";
+import { Modal } from "@/components/ui/Modal";
 import { useServices } from "@/hooks/useServices";
 import { useUpdateSMTP } from "@/hooks/useSMTP";
 import type { EditServiceModalProps } from "@/lib/interface";
@@ -18,21 +18,15 @@ export function EditServiceModal({
   onUpdate,
 }: EditServiceModalProps) {
   const { showToast } = useToast();
-  const [name, setName] = useState("");
-  const { data: services = [], isLoading: loading } = useServices();
+  const [name, setName] = useState(service?.label || "");
+  const { data: services = [] } = useServices();
   const updateMutation = useUpdateSMTP();
   const providerDef = services.find((s) => s.id === service?.provider);
   
-  const [connectedEmail, setConnectedEmail] = useState<string | null>(null);
-  const [disconnecting, setDisconnecting] = useState(false);
+  const [connectedEmail, setConnectedEmail] = useState<string | null>(
+    service?.user || null,
+  );
   const [testEmail, setTestEmail] = useState(true);
-
-  useEffect(() => {
-    if (isOpen && service) {
-      setName(service.label || "");
-      setConnectedEmail(service.user || null);
-    }
-  }, [isOpen, service]);
 
   if (!isOpen || !service) return null;
 
@@ -44,14 +38,13 @@ export function EditServiceModal({
       return;
     }
     try {
-      setDisconnecting(true);
       await updateMutation.mutateAsync({ id: serviceMongoId, data: { user: "", fromEmail: "" } });
       setConnectedEmail(null);
       showToast("Service disconnected", "success");
-    } catch (error: any) {
-      showToast(error.message || "Failed to disconnect", "error");
-    } finally {
-      setDisconnecting(false);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Failed to disconnect";
+      showToast(message, "error");
     }
   };
 
@@ -63,8 +56,10 @@ export function EditServiceModal({
 
       if (onUpdate) onUpdate();
       onClose();
-    } catch (error: any) {
-      showToast(error.message || "Failed to update service", "error");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update service";
+      showToast(message, "error");
     }
   };
 
@@ -90,23 +85,14 @@ export function EditServiceModal({
       : "Limit depends on provider";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-s-16 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-bg-base rounded-s-8 shadow-2xl w-full max-w-2xl overflow-hidden border border-border animate-slide-up flex flex-col max-h-[90vh]">
-        {/* Header matching the screenshot */}
-        <div className="flex items-center justify-between p-s-16 bg-[#4f6ebf] text-white">
-          <h2 className="text-s-14 font-semibold">Edit Service</h2>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={onClose}
-            className="p-s-4 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-          >
-            <X size={18} />
-          </Button>
-        </div>
-
-        {/* Body */}
-        <div className="flex flex-col flex-1 overflow-y-auto custom-scrollbar bg-bg-base text-text-primary">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Edit Service"
+      maxWidth="max-w-2xl"
+      bodyClassName="no-scrollbar !pr-0 text-text-primary"
+    >
+      <div className="flex flex-col bg-bg-base text-text-primary rounded-s-12 overflow-hidden">
           {/* Top Info Section */}
           <div className="flex items-center gap-s-16 p-s-24 border-b border-border-dim">
             <div className="w-s-48 h-s-48 shrink-0 flex items-center justify-center bg-white rounded-s-8 p-s-8 border border-border">
@@ -258,24 +244,22 @@ export function EditServiceModal({
                 </span>
               </label>
             </div>
-          </div>
-        </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-s-12 p-s-16 border-t border-border bg-bg-card">
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleUpdate}
-            loading={updateMutation.isPending}
-            icon={<Check size={18} />}
-          >
-            Update Service
-          </Button>
-        </div>
+            <div className="flex items-center justify-end gap-s-12 pt-s-8">
+              <Button variant="ghost" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleUpdate}
+                loading={updateMutation.isPending}
+                icon={<Check size={18} />}
+              >
+                Update Service
+              </Button>
+            </div>
+          </div>
       </div>
-    </div>
+    </Modal>
   );
 }

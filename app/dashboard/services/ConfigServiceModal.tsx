@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, HelpCircle, Check, RefreshCw } from "lucide-react";
+import { HelpCircle, Check, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { ServiceDef } from "@/lib/api";
+import { Modal } from "@/components/ui/Modal";
 import { useSaveSMTP } from "@/hooks/useSMTP";
 import type { ConfigServiceModalProps } from "@/lib/interface";
-import Image from "next/image";
 import { useServiceContext } from "@/context/ServiceContext";
 import { handleGoogleSignIn, handleMicrosoftSignIn } from "@/helper";
 import { useToast } from "@/context/ToastContext";
@@ -32,9 +31,12 @@ export function ConfigServiceModal({
   const [secure, setSecure] = useState(false);
 
   const { setActiveServiceId } = useServiceContext();
+  const wasOpenRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (isOpen && serviceDef) {
+    const justOpened = isOpen && !wasOpenRef.current;
+
+    if (justOpened && serviceDef) {
       setName(serviceDef.name || "");
       const newId = `${serviceDef.id}_${Math.random().toString(36).substring(2, 7)}`;
       setServiceId(newId);
@@ -47,14 +49,16 @@ export function ConfigServiceModal({
       setPort(serviceDef.smtpPort || 587);
       setSecure(serviceDef.smtpSecure ?? (serviceDef.smtpPort === 465));
     }
-  }, [isOpen, serviceDef]);
+
+    wasOpenRef.current = isOpen;
+  }, [isOpen, serviceDef, setActiveServiceId]);
 
   const handleClose = () => {
     setActiveServiceId(null);
     onClose();
   };
 
-  if (!isOpen || !serviceDef) return null;
+  if (!serviceDef) return null;
 
   const isOauth = serviceDef.id === "gmail" || serviceDef.id === "outlook";
 
@@ -100,9 +104,11 @@ export function ConfigServiceModal({
       showToast("Service created successfully", "success");
 
       if (onCreated) onCreated();
-      onClose();
-    } catch (error: any) {
-      showToast(error.message || "Failed to create service", "error");
+      handleClose();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Failed to create service";
+      showToast(message, "error");
     }
   };
 
@@ -149,23 +155,14 @@ export function ConfigServiceModal({
     showToast("Service ID regenerated", "info");
   };
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-s-16 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-bg-base rounded-s-8 shadow-2xl w-full max-w-2xl overflow-hidden border border-border animate-slide-up flex flex-col max-h-[90vh]">
-        {/* Header matching the screenshot */}
-        <div className="flex items-center justify-between p-s-16 bg-[#4f6ebf] text-white">
-          <h2 className="text-s-14 font-semibold">Config Service</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            className="p-s-4 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-          >
-            <X size={18} />
-          </Button>
-        </div>
-
-        {/* Body */}
-        <div className="flex flex-col flex-1 overflow-y-auto custom-scrollbar bg-bg-base text-text-primary">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Config Service"
+      maxWidth="max-w-2xl"
+      bodyClassName="no-scrollbar !pr-0 text-text-primary"
+    >
+      <div className="flex flex-col bg-bg-base text-text-primary rounded-s-12 overflow-hidden">
           {/* Top Info Section */}
           <div className="flex items-center gap-s-16 p-s-24 border-b border-border-dim">
             <div className="w-s-48 h-s-48 shrink-0 flex items-center justify-center bg-white rounded-s-8 p-s-8 border border-border">
@@ -401,24 +398,22 @@ export function ConfigServiceModal({
                 </span>
               </label>
             </div>
-          </div>
-        </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-s-12 p-s-16 border-t border-border bg-bg-card">
-          <Button variant="ghost" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleCreate}
-            loading={saveMutation.isPending}
-            icon={<Check size={18} />}
-          >
-            Create Service
-          </Button>
-        </div>
+            <div className="flex items-center justify-end gap-s-12 pt-s-8">
+              <Button variant="ghost" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleCreate}
+                loading={saveMutation.isPending}
+                icon={<Check size={18} />}
+              >
+                Create Service
+              </Button>
+            </div>
+          </div>
       </div>
-    </div>
+    </Modal>
   );
 }

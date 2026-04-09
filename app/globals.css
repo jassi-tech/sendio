@@ -163,6 +163,18 @@
     animation: spin 0.8s linear infinite;
   }
 
+  /* Hide scrollbar but keep scrolling behavior */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
   /* Custom pattern for preview pane background */
   .preview-bg-pattern {
     background-image:
