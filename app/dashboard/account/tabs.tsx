@@ -1,13 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { 
-  useDeleteAccount, 
-  useRequestEmailChange, 
+import {
+  useDeleteAccount,
+  useRequestEmailChange,
   useVerifyEmailChange,
   useSubscription,
   useUpgradePlan,
-  useCancelSubscription
+  useCancelSubscription,
 } from "@/hooks/useAuth";
 import { useToast } from "@/context/ToastContext";
 import { Card } from "@/components/ui/Card";
@@ -30,7 +30,13 @@ import {
 import { useRouter } from "next/navigation";
 import { plans } from "@/lib/pricing";
 
-function EmailChangeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function EmailChangeModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const { showToast } = useToast();
   const [step, setStep] = useState<"email" | "otp">("email");
   const [newEmail, setNewEmail] = useState("");
@@ -76,7 +82,8 @@ function EmailChangeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
       {step === "email" ? (
         <form onSubmit={handleRequest} className="space-y-s-20">
           <p className="text-s-13 text-text-secondary leading-relaxed">
-            Enter the new email address you'd like to use. We'll send a 6-digit verification code to this address.
+            Enter the new email address you'd like to use. We'll send a 6-digit
+            verification code to this address.
           </p>
           <div className="space-y-s-8">
             <label className="text-s-12 font-bold text-text-secondary uppercase tracking-wider">
@@ -109,7 +116,10 @@ function EmailChangeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
             </div>
             <div>
               <p className="text-s-13 text-text-secondary">
-                We've sent a 6-digit code to <span className="font-bold text-text-primary px-s-4 py-s-1 bg-bg-elevated rounded-s-4 border border-border/50">{newEmail}</span>
+                We've sent a 6-digit code to{" "}
+                <span className="font-bold text-text-primary px-s-4 py-s-1 bg-bg-elevated rounded-s-4 border border-border/50">
+                  {newEmail}
+                </span>
               </p>
             </div>
           </div>
@@ -121,7 +131,9 @@ function EmailChangeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
               placeholder="000000"
               className="text-center text-s-24 font-bold tracking-[0.5em] h-s-64"
               value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              onChange={(e) =>
+                setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+              }
               required
               autoFocus
             />
@@ -259,7 +271,7 @@ export function GeneralTab() {
 export function SubscriptionTab() {
   const { showToast } = useToast();
   const { data: sub, isLoading, error } = useSubscription();
-  const upgradeMutation = useUpgradePlan();
+  const router = useRouter();
   const cancelMutation = useCancelSubscription();
 
   if (isLoading) {
@@ -273,23 +285,27 @@ export function SubscriptionTab() {
   if (error || !sub) {
     return (
       <Card variant="solid" className="p-s-32 text-center">
-        <p className="text-error mb-s-16">Failed to load subscription details</p>
-        <Button variant="secondary" onClick={() => window.location.reload()}>Retry</Button>
+        <p className="text-error mb-s-16">
+          Failed to load subscription details
+        </p>
+        <Button variant="secondary" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
       </Card>
     );
   }
 
-  const handleUpgrade = async () => {
-    try {
-      await upgradeMutation.mutateAsync();
-      showToast("Upgrade initiated. Redirecting to payment...", "success");
-    } catch (err: any) {
-      showToast(err.message || "Failed to initiate upgrade", "error");
-    }
+  const handleUpgrade = () => {
+    router.push("/dashboard/upgrade");
   };
 
   const handleCancel = async () => {
-    if (!confirm("Are you sure you want to cancel your subscription? You will be moved to the Free plan.")) return;
+    if (
+      !confirm(
+        "Are you sure you want to cancel your subscription? You will be moved to the Free plan.",
+      )
+    )
+      return;
     try {
       await cancelMutation.mutateAsync();
       showToast("Subscription cancelled", "success");
@@ -326,7 +342,9 @@ export function SubscriptionTab() {
           <span className="font-semibold text-text-primary">
             {sub.plan}
             <span className="text-text-muted font-normal ml-s-8">
-              {sub.plan.toLowerCase() === "free" ? "/ Lifetime Free" : "/ Active Subscription"}
+              {sub.plan.toLowerCase() === "free"
+                ? "/ Lifetime Free"
+                : "/ Active Subscription"}
             </span>
           </span>
         </div>
@@ -343,9 +361,9 @@ export function SubscriptionTab() {
               {sub.remainingPercentage}% remaining
             </span>
             <div className="w-full h-s-6 bg-bg-elevated rounded-full overflow-hidden">
-              <div 
-                className={`h-full ${sub.remainingPercentage < 10 ? 'bg-error' : 'bg-success'}`}
-                style={{ width: `${sub.remainingPercentage}%` }} 
+              <div
+                className={`h-full ${sub.remainingPercentage < 10 ? "bg-error" : "bg-success"}`}
+                style={{ width: `${sub.remainingPercentage}%` }}
               />
             </div>
           </div>
@@ -371,7 +389,6 @@ export function SubscriptionTab() {
           size="sm"
           icon={<Zap className="w-s-14 h-s-14" />}
           onClick={handleUpgrade}
-          loading={upgradeMutation.isPending}
         >
           {sub.plan.toLowerCase() === "free" ? "Upgrade Plan" : "Change Plan"}
         </Button>
