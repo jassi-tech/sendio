@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: { default: "Sendio", template: "%s | Sendio" },
   description:
     "User-owned SMTP email platform – send transactional emails through your own credentials with Sendio.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 import { ToastProvider } from "@/context/ToastContext";

@@ -2,24 +2,26 @@
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
 
 export function Navbar() {
   const { user, loading } = useAuth();
 
   return (
     <div className="z-50 px-s-40 pt-s-24">
-      <nav className="max-w-s-1200 mx-auto glass rounded-s-16 py-s-12 px-s-32 flex items-center justify-between shadow-2xl border-white/10">
+      <nav className="max-w-s-1200 mx-auto glass rounded-s-16 pt-s-12 px-s-32 flex items-center justify-between shadow-2xl border-white/10">
         {/* Logo/Brand */}
         <Link
           href="/"
           className="flex items-center gap-s-10 no-underline group"
         >
-          <div className="w-s-32 h-s-32 bg-gradient-to-br from-[#6c63ff] to-[#a855f7] rounded-s-8 flex items-center justify-center shadow-accent-glow transition-transform group-hover:scale-105">
-            <Mail className="w-s-16 h-s-16 text-white" />
-          </div>
-          <span className="text-s-18 font-bold text-text-primary tracking-tight transition-colors group-hover:text-accent">
-            Sendio
-          </span>
+          <Image
+            src="/logo.svg"
+            alt="Sendio Logo"
+            width={150}
+            height={100}
+            className="w-s-150  object-contain group-hover:brightness-110 transition-all"
+          />
         </Link>
 
         {/* Middle Nav - Desktop only */}

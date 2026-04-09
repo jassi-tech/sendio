@@ -159,7 +159,7 @@ export default function OverviewPage() {
                 step: "2",
               },
               {
-                text: "Review Documentation",
+                text: "Review Documeavtation",
                 href: "/dashboard/logs",
                 step: "3",
               },
